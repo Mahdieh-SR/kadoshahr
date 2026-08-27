@@ -1,0 +1,306 @@
+// Prisma schema — فروشگاه گیفت‌کارت و اکانت دیجیتال
+// مبالغ همه جا به «تومان» و به صورت عدد صحیح (Int) ذخیره می‌شوند.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ReviewStatus {
+  PENDING // در انتظار تایید مدیر
+  APPROVED // تاییدشده و قابل نمایش
+  REJECTED // رد شده
+}
+
+enum DiscountType {
+  PERCENT // درصدی
+  FIXED // مبلغ ثابت به تومان
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT // در انتظار پرداخت
+  PAID // پرداخت‌شده
+  DELIVERED // تحویل‌شده
+  FAILED // پرداخت ناموفق
+  CANCELLED // لغو شده
+}
+
+model User {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  name      String?
+  email     String?
+  role      Role     @default(USER)
+
+  // آدرس پستی پیش‌فرض — هنگام تسویه‌حساب خودکار پر می‌شود
+  province   String?
+  city       String?
+  address    String?
+  postalCode String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders      Order[]
+  redemptions DiscountRedemption[]
+  reviews     Review[]
+
+  @@index([createdAt])
+}
+
+/// کدهای یک‌بار مصرف ورود. کد به صورت هش ذخیره می‌شود، نه متن خام.
+model OtpCode {
+  id         String    @id @default(cuid())
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
+}
+
+/// شمارنده‌ی محدودیت نرخ درخواست (fixed window) — پشتوانه‌ی دیتابیسی تا بعد از ری‌استارت هم پابرجا بماند.
+model RateLimit {
+  key         String   @id
+  count       Int      @default(0)
+  windowStart DateTime @default(now())
+
+  @@index([windowStart])
+}
+
+/// فقط برای حالت درگاه ساختگی (ZARINPAL_MODE=mock).
+/// تصمیم «پرداخت موفق/ناموفق» اینجا سمت سرور ثبت می‌شود تا مسیر تایید پرداخت
+/// دقیقاً مثل حالت واقعی باشد: سرور از درگاه می‌پرسد، نه از آدرس مرورگر.
+model MockPayment {
+  authority String   @id
+  amount    Int
+  approved  Boolean?
+  createdAt DateTime @default(now())
+}
+
+/// کد تخفیف. همه‌ی محاسبات سمت سرور و از روی همین رکورد انجام می‌شود.
+model DiscountCode {
+  id   String       @id @default(cuid())
+  /// همیشه با حروف بزرگ انگلیسی ذخیره می‌شود تا مقایسه بدون حساسیت به حالت باشد
+  code String       @unique
+  type DiscountType
+
+  /// برای PERCENT عددی بین ۱ تا ۱۰۰، برای FIXED مبلغ به تومان
+  value Int
+
+  /// حداقل مبلغ سبد برای اینکه کد قابل استفاده باشد
+  minOrderAmount Int @default(0)
+  /// سقف تخفیف برای کدهای درصدی (۰ یعنی بدون سقف)
+  maxDiscountAmount Int @default(0)
+
+  /// سقف کل دفعات استفاده (۰ یعنی نامحدود)
+  usageLimit Int @default(0)
+  usedCount  Int @default(0)
+  /// سقف دفعات استفاده برای هر کاربر
+  perUserLimit Int @default(1)
+
+  startsAt  DateTime?
+  expiresAt DateTime?
+  isActive  Boolean   @default(true)
+
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders      Order[]
+  redemptions DiscountRedemption[]
+
+  @@index([isActive, expiresAt])
+}
+
+/// ثبت هر بار استفاده‌ی موفق از کد — مبنای بررسی سقف «هر کاربر».
+/// فقط بعد از پرداخت موفق ساخته می‌شود، نه هنگام ثبت سفارش.
+model DiscountRedemption {
+  id        String   @id @default(cuid())
+  amount    Int
+  createdAt DateTime @default(now())
+
+  codeId String
+  code   DiscountCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([codeId, userId])
+}
+
+/// نظر مشتری درباره‌ی محصول.
+/// فقط کسی می‌تواند نظر بدهد که همان محصول را واقعاً خریده باشد،
+/// و نظر تا وقتی مدیر تاییدش نکند در سایت دیده نمی‌شود.
+model Review {
+  id      String       @id @default(cuid())
+  rating  Int
+  comment String       @db.Text
+  status  ReviewStatus @default(PENDING)
+
+  /// پاسخ مدیر فروشگاه به نظر (اختیاری)
+  adminReply String?
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // هر کاربر برای هر محصول فقط یک نظر
+  @@unique([productId, userId])
+  @@index([productId, status])
+  @@index([status, createdAt])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  /// نام آیکون برای نمایش در گرید دسته‌بندی‌ها
+  icon      String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  products Product[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  /// مشخصات فنی به صورت لیست «عنوان/مقدار» برای تب مشخصات
+  specs       Json?
+  images      String[]
+  isActive    Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
+  soldCount   Int      @default(0)
+
+  /// تعداد نظرهای تاییدشده و جمع امتیازها — برای محاسبه‌ی سریع میانگین
+  reviewCount Int @default(0)
+  ratingSum   Int @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  variants ProductVariant[]
+  reviews  Review[]
+
+  @@index([categoryId])
+  @@index([isActive, createdAt])
+}
+
+/// هر ترکیب پلتفرم/ریجن/حجم یک وردایانت جداست و قیمت مستقل دارد.
+model ProductVariant {
+  id       String @id @default(cuid())
+  label    String
+  platform String
+  region   String
+  capacity String
+
+  /// قیمت فروش به تومان
+  price          Int
+  /// قیمت قبل از تخفیف؛ اگر بزرگ‌تر از price باشد، تخفیف نمایش داده می‌شود
+  compareAtPrice Int?
+  stock          Int     @default(0)
+  isActive       Boolean @default(true)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  orderItems OrderItem[]
+
+  @@index([productId])
+  @@index([platform, region])
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  /// کد سفارش قابل نمایش به مشتری
+  orderNumber String      @unique
+  status      OrderStatus @default(PENDING_PAYMENT)
+
+  /// جمع اقلام پیش از تخفیف
+  subtotalAmount Int @default(0)
+  /// مبلغ تخفیف اعمال‌شده
+  discountAmount Int @default(0)
+  /// متن کد تخفیف در لحظه‌ی خرید (کپی می‌شود تا حذف بعدی کد، سفارش را خراب نکند)
+  discountCode String?
+
+  discountCodeId String?
+  discount       DiscountCode? @relation(fields: [discountCodeId], references: [id])
+
+  /// مبلغ نهایی قابل پرداخت — همیشه سمت سرور از روی قیمت دیتابیس محاسبه می‌شود
+  totalAmount Int
+
+  // اطلاعات گیرنده
+  firstName String
+  lastName  String
+  email     String
+
+  // آدرس در لحظه‌ی ثبت سفارش کپی می‌شود؛ اگر کاربر بعداً آدرسش را عوض کند
+  // سفارش‌های قبلی همان آدرسی را نگه می‌دارند که برایشان ارسال شده است.
+  province   String?
+  city       String?
+  address    String?
+  postalCode String?
+
+  // اطلاعات درگاه زرین‌پال
+  authority     String?   @unique
+  refId         String?
+  cardPan       String?
+  failureReason String?
+  paidAt        DateTime?
+
+  /// یادداشت ادمین — مثلاً کد گیفت‌کارتی که دستی برای مشتری ارسال شده
+  deliveryNote String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  items      OrderItem[]
+  redemption DiscountRedemption?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+/// عنوان و قیمت در لحظه‌ی خرید کپی می‌شوند تا تغییرات بعدی محصول، سفارش قدیمی را تغییر ندهد.
+model OrderItem {
+  id           String @id @default(cuid())
+  productTitle String
+  variantLabel String
+  quantity     Int
+  unitPrice    Int
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+
+  @@index([orderId])
+}

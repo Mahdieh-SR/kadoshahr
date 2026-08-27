@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <rect width="800" height="600" fill="#14122a"/>
+  
+  <g opacity="0.85">
+    <rect x="70" y="120" width="70" height="360" rx="35" fill="#5ad3a8" opacity="0.25"/>
+    <rect x="170" y="170" width="70" height="260" rx="35" fill="#5ad3a8" opacity="0.45"/>
+    <rect x="270" y="210" width="70" height="180" rx="35" fill="#5ad3a8" opacity="0.7"/>
+    <rect x="370" y="170" width="70" height="260" rx="35" fill="#5ad3a8" opacity="0.45"/>
+    <rect x="470" y="120" width="70" height="360" rx="35" fill="#5ad3a8" opacity="0.25"/>
+  </g>
+  <rect x="600" y="120" width="130" height="360" rx="28" fill="#0b0917" stroke="#5ad3a8" stroke-width="2"/>
+  <circle cx="665" cy="300" r="34" fill="#5ad3a8"/>
+  <rect x="0" y="500" width="800" height="100" fill="#0b0917"/>
+  <text x="40" y="562" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" fill="#ffffff" text-anchor="start">Google Play</text>
+
+</svg>

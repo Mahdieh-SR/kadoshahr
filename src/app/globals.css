@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/* ───────────────────────────────────────────────
+   سیستم طراحی: آبی/بنفش تیره + تاکید نعنایی روشن
+   سبک فلت — بدون گرادینت سنگین، بدون سایه‌ی زیاد
+   ─────────────────────────────────────────────── */
+@theme {
+  /* پس‌زمینه و سطوح */
+  --color-ink-950: #08070f;
+  --color-ink-900: #0f0d1d;
+  --color-ink-800: #17142b;
+  --color-ink-700: #221d3d;
+  --color-ink-600: #332c5a;
+
+  /* متن */
+  --color-fg: #edeaf7;
+  --color-muted: #9a93b8;
+
+  /* رنگ اصلی برند — بنفش تکنولوژیک */
+  --color-brand-400: #8877ff;
+  --color-brand-500: #6c5ce7;
+  --color-brand-600: #5546c9;
+
+  /* رنگ تاکیدی CTA — نعنایی روشن، روی تیره کاملاً خواناست */
+  --color-accent-400: #3de9c0;
+  --color-accent-500: #22d3ac;
+
+  /* وضعیت‌ها */
+  --color-success: #34d399;
+  --color-danger: #fb7185;
+  --color-warning: #fbbf24;
+
+  --font-sans: Vazirmatn, ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+
+  --radius-card: 0.875rem;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-ink-950);
+  color: var(--color-fg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* اعداد فارسی در همه‌ی متن‌ها به شکل استاندارد نمایش داده شوند */
+* {
+  font-variant-numeric: normal;
+}
+
+/* اسکرول‌بار هماهنگ با تم تیره */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink-950);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink-700);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-600);
+}
+
+/* حلقه‌ی فوکوس یکدست برای دسترسی‌پذیری با کیبورد */
+:focus-visible {
+  outline: 2px solid var(--color-accent-400);
+  outline-offset: 2px;
+}
+
+/* حذف فلش‌های عددی input[type=number] */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding-inline: 1.25rem;
+}

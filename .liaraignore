@@ -1,0 +1,23 @@
+# فایل‌هایی که لازم نیست به سرور آپلود شوند
+
+node_modules
+.next
+.git
+
+# رمزها هرگز آپلود نمی‌شوند — مقادیر واقعی در پنل لیارا تنظیم می‌شوند
+.env
+.env.*
+!.env.example
+
+# اسکریپت‌های تست فقط روی کامپیوتر خودمان اجرا می‌شوند
+scripts
+dev.log
+og-preview.png
+
+# مستندات
+HANDOFF.md
+AGENTS.md
+CLAUDE.md
+.claude
+
+*.tsbuildinfo

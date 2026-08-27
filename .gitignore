@@ -1,0 +1,45 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+/src/generated
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files -- NEVER commit these
+.env
+.env.*
+!.env.example
+
+# typescript
+*.tsbuildinfo
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+/src/generated/prisma
+
+# لاگ‌های اجرا — ممکن است کد تایید و اطلاعات حساس داشته باشند
+*.log
+og-preview.png
+
+# مهارت‌های ابزار Prisma (خودکار ساخته می‌شوند)
+.claude/skills
