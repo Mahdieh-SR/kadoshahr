@@ -6,12 +6,13 @@
  * بعداً کافی است در پنل ادمین به‌جای این‌ها آدرس تصویر واقعی گذاشته شود.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { catalog } from "./catalog.js";
 
-const projectRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
-const outDir = join(projectRoot, "public", "products");
+// از پوشه‌ی جاری استفاده می‌کنیم نه import.meta، تا این فایل هم در سبک
+// ماژول جدید و هم قدیمی اجرا شود. اسکریپت‌ها همیشه از ریشه‌ی پروژه
+// اجرا می‌شوند (npm run db:seed).
+const outDir = join(process.cwd(), "public", "products");
 
 const BG = "#14122a";
 const INK = "#0b0917";
@@ -108,7 +109,7 @@ export function generateProductImages(): Map<string, string[]> {
 }
 
 // اجرای مستقیم: tsx prisma/generate-images.ts
-if (process.argv[1] && process.argv[1].endsWith("generate-images.ts")) {
+if (process.argv[1]?.endsWith("generate-images.ts")) {
   const map = generateProductImages();
   console.log(`${map.size * 3} تصویر نمونه در public/products ساخته شد.`);
 }
