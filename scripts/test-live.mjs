@@ -128,9 +128,33 @@ let variantId = null;
   const slug = html.match(/\/product\/([a-z0-9-]+)/)?.[1];
 
   const productHtml = await (await fetch(`${BASE}/product/${slug}`)).text();
-  variantId = productHtml.match(/"(c[a-z0-9]{20,})"/)?.[1] ?? null;
 
-  check("شناسه‌ی محصول از صفحه خوانده شد", Boolean(variantId), `محصول: ${slug}`);
+  // شناسه‌ها ممکن است در HTML به شکل‌های مختلف کدگذاری شوند؛ همه‌ی
+  // کاندیداها را جمع می‌کنیم و با API سبد بررسی می‌کنیم کدام واقعی است.
+  const candidates = [
+    ...new Set(
+      (productHtml.match(/c[a-z0-9]{24,}/g) ?? []).filter((id) => id.length < 40)
+    ),
+  ];
+
+  for (const candidate of candidates.slice(0, 25)) {
+    const res = await fetch(`${BASE}/api/cart`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ variantIds: [candidate] }),
+    });
+    const data = await res.json();
+    if (data.items?.length) {
+      variantId = candidate;
+      break;
+    }
+  }
+
+  check(
+    "شناسه‌ی محصول از صفحه خوانده شد",
+    Boolean(variantId),
+    `محصول: ${slug}`
+  );
 }
 
 if (variantId) {
