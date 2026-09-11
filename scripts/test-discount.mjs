@@ -82,7 +82,11 @@ const randomPhone = (p = "0914") =>
 
 /* ── محصول تست ── */
 const { rows: variants } = await db.query(
-  `select id, price from "ProductVariant" where stock > 5 order by price asc limit 1`
+  // فقط نسخه‌ای که واقعاً در فروشگاه قابل خرید است
+  `select v.id, v.price from "ProductVariant" v
+     join "Product" p on p.id = v."productId"
+    where v.stock > 5 and v."isActive" and p."isActive"
+    order by v.price asc limit 1`
 );
 const variant = variants[0];
 const items = [{ variantId: variant.id, quantity: 1 }];

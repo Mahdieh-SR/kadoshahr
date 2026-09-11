@@ -52,3 +52,6 @@ kadoshahr-deploy.zip
 
 # لاگ اجرای سرور روی همین کامپیوتر
 logs/
+
+.vercel
+.env*

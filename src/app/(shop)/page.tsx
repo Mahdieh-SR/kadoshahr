@@ -27,8 +27,8 @@ export default async function HomePage() {
 
   const [categories, bestsellers, newest] = await Promise.all([
     getCategories(),
-    getProductCards({ sort: "bestselling", take: 4 }),
-    getProductCards({ sort: "newest", take: 4 }),
+    getProductCards({ sort: "bestselling", take: 4, inStockOnly: true }),
+    getProductCards({ sort: "newest", take: 4, inStockOnly: true }),
   ]);
 
   return (

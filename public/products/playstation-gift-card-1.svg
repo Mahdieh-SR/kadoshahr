@@ -1,13 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
-  <rect width="800" height="600" fill="#14122a"/>
+  <rect width="800" height="600" fill="#ffffff"/>
   
-  <circle cx="660" cy="90" r="190" fill="#4f7cff" opacity="0.10"/>
-  <circle cx="120" cy="540" r="150" fill="#4f7cff" opacity="0.07"/>
-  <rect x="160" y="150" width="480" height="300" rx="26" fill="#0b0917" stroke="#4f7cff" stroke-width="2" opacity="0.98"/>
-  <rect x="160" y="150" width="480" height="10" rx="5" fill="#4f7cff"/>
-  <rect x="196" y="356" width="150" height="14" rx="7" fill="#4f7cff" opacity="0.55"/>
+  <circle cx="660" cy="90" r="190" fill="#0070d1" opacity="0.16"/>
+  <circle cx="120" cy="540" r="150" fill="#0070d1" opacity="0.12"/>
+  <rect x="160" y="150" width="480" height="300" rx="26" fill="#0b0917" stroke="#0070d1" stroke-width="2" opacity="0.98"/>
+  <rect x="160" y="150" width="480" height="10" rx="5" fill="#0070d1"/>
+  <rect x="196" y="356" width="150" height="14" rx="7" fill="#0070d1" opacity="0.55"/>
   <rect x="196" y="386" width="96" height="14" rx="7" fill="#ffffff" opacity="0.16"/>
-  <circle cx="576" cy="378" r="30" fill="#4f7cff" opacity="0.85"/>
-  <text x="400" y="290" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#ffffff" text-anchor="middle">PlayStation</text>
+  <circle cx="576" cy="378" r="30" fill="#0070d1" opacity="0.85"/>
+  <image href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDA3MGQxIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+UGxheVN0YXRpb248L3RpdGxlPjxwYXRoIGQ9Ik04Ljk4NCAyLjU5NnYxNy41NDdsMy45MTUgMS4yNjFWNi42ODhjMC0uNjkuMzA0LTEuMTUxLjc5NC0uOTkxLjYzNi4xOC43Ni44MTQuNzYgMS41MDV2NS44NzVjMi40NDEgMS4xOTMgNC4zNjItLjAwMiA0LjM2Mi0zLjE1MiAwLTMuMjM3LTEuMTI2LTQuNjc1LTQuNDM4LTUuODI3LTEuMzA3LS40NDgtMy43MjgtMS4xODYtNS4zOS0xLjUwMnptNC42NTYgMTYuMjQxbDYuMjk2LTIuMjc1Yy43MTUtLjI1OC44MjYtLjYyNS4yNDYtLjgxOC0uNTg2LS4xOTItMS42MzctLjEzOS0yLjM1Ny4xMjNsLTQuMjA1IDEuNVYxNC45OGwuMjQtLjA4NXMxLjIwMS0uNDIgMi45MTMtLjYxNWMxLjY5Ni0uMTggMy43ODUuMDMgNS40MzcuNjYxIDEuODQ4LjYwMSAyLjA0IDEuNDcyIDEuNTc2IDIuMDcyLS40NjUuNi0xLjYyMiAxLjAzNi0xLjYyMiAxLjAzNmwtOC41NDQgMy4xMDdWMTguODZ6TTEuODA3IDE4LjZjLTEuOS0uNTQ1LTIuMjE0LTEuNjY4LTEuMzUyLTIuMzIuODAxLS41ODYgMi4xNi0xLjA1MiAyLjE2LTEuMDUybDUuNjE1LTIuMDEzdjIuMzEzTDQuMjA1IDE3Yy0uNzA1LjI3MS0uODI1LjYzMi0uMjM5LjgyNi41ODYuMTk1IDEuNjM3LjE1IDIuMzQzLS4xMkw4LjI0NyAxN3YyLjA3NGMtLjEyLjAzLS4yNTYuMDQ0LS4zOS4wNzMtMS45MzkuMzMxLTMuOTk2LjE5Ni02LjAzOC0uNDc5eiIvPjwvc3ZnPgo=" x="362" y="183" width="76" height="76"/>
+  <text x="400" y="315" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#ffffff" text-anchor="middle">PlayStation</text>
 
 </svg>

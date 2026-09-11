@@ -5,6 +5,12 @@ CREATE SCHEMA IF NOT EXISTS "public";
 CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 
 -- CreateEnum
+CREATE TYPE "ReviewStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+
+-- CreateEnum
+CREATE TYPE "DiscountType" AS ENUM ('PERCENT', 'FIXED');
+
+-- CreateEnum
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING_PAYMENT', 'PAID', 'DELIVERED', 'FAILED', 'CANCELLED');
 
 -- CreateTable
@@ -14,6 +20,10 @@ CREATE TABLE "User" (
     "name" TEXT,
     "email" TEXT,
     "role" "Role" NOT NULL DEFAULT 'USER',
+    "province" TEXT,
+    "city" TEXT,
+    "address" TEXT,
+    "postalCode" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -43,6 +53,64 @@ CREATE TABLE "RateLimit" (
 );
 
 -- CreateTable
+CREATE TABLE "MockPayment" (
+    "authority" TEXT NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "approved" BOOLEAN,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "MockPayment_pkey" PRIMARY KEY ("authority")
+);
+
+-- CreateTable
+CREATE TABLE "DiscountCode" (
+    "id" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "type" "DiscountType" NOT NULL,
+    "value" INTEGER NOT NULL,
+    "minOrderAmount" INTEGER NOT NULL DEFAULT 0,
+    "maxDiscountAmount" INTEGER NOT NULL DEFAULT 0,
+    "usageLimit" INTEGER NOT NULL DEFAULT 0,
+    "usedCount" INTEGER NOT NULL DEFAULT 0,
+    "perUserLimit" INTEGER NOT NULL DEFAULT 1,
+    "startsAt" TIMESTAMP(3),
+    "expiresAt" TIMESTAMP(3),
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "description" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "DiscountCode_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "DiscountRedemption" (
+    "id" TEXT NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "codeId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "orderId" TEXT NOT NULL,
+
+    CONSTRAINT "DiscountRedemption_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Review" (
+    "id" TEXT NOT NULL,
+    "rating" INTEGER NOT NULL,
+    "comment" TEXT NOT NULL,
+    "status" "ReviewStatus" NOT NULL DEFAULT 'PENDING',
+    "adminReply" TEXT,
+    "productId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Category" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -61,15 +129,33 @@ CREATE TABLE "Product" (
     "slug" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "specs" JSONB,
+    "optionLabels" JSONB,
     "images" TEXT[],
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "isFeatured" BOOLEAN NOT NULL DEFAULT false,
     "soldCount" INTEGER NOT NULL DEFAULT 0,
+    "reviewCount" INTEGER NOT NULL DEFAULT 0,
+    "ratingSum" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "categoryId" TEXT NOT NULL,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PricingSettings" (
+    "id" INTEGER NOT NULL DEFAULT 1,
+    "usdRate" INTEGER NOT NULL DEFAULT 0,
+    "marginPercent" INTEGER NOT NULL DEFAULT 0,
+    "roundTo" INTEGER NOT NULL DEFAULT 1000,
+    "suggestedRate" INTEGER,
+    "suggestedAt" TIMESTAMP(3),
+    "suggestedFrom" TEXT,
+    "appliedAt" TIMESTAMP(3),
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PricingSettings_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -81,6 +167,9 @@ CREATE TABLE "ProductVariant" (
     "capacity" TEXT NOT NULL,
     "price" INTEGER NOT NULL,
     "compareAtPrice" INTEGER,
+    "priceUsd" INTEGER,
+    "compareAtUsd" INTEGER,
+    "usdPriced" BOOLEAN NOT NULL DEFAULT false,
     "stock" INTEGER NOT NULL DEFAULT 0,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "productId" TEXT NOT NULL,
@@ -93,10 +182,18 @@ CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
     "orderNumber" TEXT NOT NULL,
     "status" "OrderStatus" NOT NULL DEFAULT 'PENDING_PAYMENT',
+    "subtotalAmount" INTEGER NOT NULL DEFAULT 0,
+    "discountAmount" INTEGER NOT NULL DEFAULT 0,
+    "discountCode" TEXT,
+    "discountCodeId" TEXT,
     "totalAmount" INTEGER NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "province" TEXT,
+    "city" TEXT,
+    "address" TEXT,
+    "postalCode" TEXT,
     "authority" TEXT,
     "refId" TEXT,
     "cardPan" TEXT,
@@ -136,6 +233,27 @@ CREATE INDEX "OtpCode_phone_createdAt_idx" ON "OtpCode"("phone", "createdAt");
 CREATE INDEX "RateLimit_windowStart_idx" ON "RateLimit"("windowStart");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "DiscountCode_code_key" ON "DiscountCode"("code");
+
+-- CreateIndex
+CREATE INDEX "DiscountCode_isActive_expiresAt_idx" ON "DiscountCode"("isActive", "expiresAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "DiscountRedemption_orderId_key" ON "DiscountRedemption"("orderId");
+
+-- CreateIndex
+CREATE INDEX "DiscountRedemption_codeId_userId_idx" ON "DiscountRedemption"("codeId", "userId");
+
+-- CreateIndex
+CREATE INDEX "Review_productId_status_idx" ON "Review"("productId", "status");
+
+-- CreateIndex
+CREATE INDEX "Review_status_createdAt_idx" ON "Review"("status", "createdAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Review_productId_userId_key" ON "Review"("productId", "userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Category_slug_key" ON "Category"("slug");
 
 -- CreateIndex
@@ -154,6 +272,9 @@ CREATE INDEX "ProductVariant_productId_idx" ON "ProductVariant"("productId");
 CREATE INDEX "ProductVariant_platform_region_idx" ON "ProductVariant"("platform", "region");
 
 -- CreateIndex
+CREATE INDEX "ProductVariant_usdPriced_idx" ON "ProductVariant"("usdPriced");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Order_orderNumber_key" ON "Order"("orderNumber");
 
 -- CreateIndex
@@ -169,10 +290,28 @@ CREATE INDEX "Order_status_createdAt_idx" ON "Order"("status", "createdAt");
 CREATE INDEX "OrderItem_orderId_idx" ON "OrderItem"("orderId");
 
 -- AddForeignKey
+ALTER TABLE "DiscountRedemption" ADD CONSTRAINT "DiscountRedemption_codeId_fkey" FOREIGN KEY ("codeId") REFERENCES "DiscountCode"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DiscountRedemption" ADD CONSTRAINT "DiscountRedemption_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DiscountRedemption" ADD CONSTRAINT "DiscountRedemption_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Product" ADD CONSTRAINT "Product_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ProductVariant" ADD CONSTRAINT "ProductVariant_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_discountCodeId_fkey" FOREIGN KEY ("discountCodeId") REFERENCES "DiscountCode"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

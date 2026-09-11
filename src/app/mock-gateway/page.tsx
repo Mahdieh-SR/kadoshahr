@@ -57,7 +57,7 @@ export default async function MockGatewayPage({
           </header>
 
           <dl className="flex flex-col gap-4 py-6 text-sm">
-            <Row label="پذیرنده" value="فروشگاه گیفت‌لند" />
+            <Row label="پذیرنده" value="فروشگاه کادوشهر" />
             {order && <Row label="شماره سفارش" value={order.orderNumber} />}
             {order && (
               <Row

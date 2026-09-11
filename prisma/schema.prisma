@@ -189,6 +189,13 @@ model Product {
   description String   @db.Text
   /// مشخصات فنی به صورت لیست «عنوان/مقدار» برای تب مشخصات
   specs       Json?
+
+  /// عنوان کادرهای انتخاب در صفحه‌ی محصول، مثلاً
+  /// {"capacity": "مدت زمان اشتراک", "region": "ریجن اکانت"}
+  /// محوری که کلیدش نباشد، کادرش نمایش داده نمی‌شود.
+  /// NULL یعنی عنوان‌های پیش‌فرض.
+  optionLabels Json?
+
   images      String[]
   isActive    Boolean  @default(true)
   isFeatured  Boolean  @default(false)
@@ -210,6 +217,29 @@ model Product {
   @@index([isActive, createdAt])
 }
 
+/// تنظیمات قیمت‌گذاری دلاری. عمداً فقط یک سطر دارد (id همیشه ۱).
+/// نرخ را مدیر وارد می‌کند؛ سرویس بیرونی فقط «پیشنهاد» می‌دهد و تا تایید نشود
+/// هیچ قیمتی عوض نمی‌شود.
+model PricingSettings {
+  id Int @id @default(1)
+
+  /// نرخ هر دلار به تومان (۰ یعنی هنوز تنظیم نشده)
+  usdRate Int @default(0)
+  /// درصد سود/کارمزد روی نرخ
+  marginPercent Int @default(0)
+  /// قیمت نهایی به بالا تا مضربی از این عدد رند می‌شود
+  roundTo Int @default(1000)
+
+  /// نرخ پیشنهادی سرویس بیرونی — اعمال‌نشده تا وقتی مدیر تایید کند
+  suggestedRate Int?
+  suggestedAt   DateTime?
+  suggestedFrom String?
+
+  /// آخرین باری که قیمت محصولات واقعاً بازنویسی شد
+  appliedAt DateTime?
+  updatedAt DateTime  @updatedAt
+}
+
 /// هر ترکیب پلتفرم/ریجن/حجم یک وردایانت جداست و قیمت مستقل دارد.
 model ProductVariant {
   id       String @id @default(cuid())
@@ -218,10 +248,19 @@ model ProductVariant {
   region   String
   capacity String
 
-  /// قیمت فروش به تومان
+  /// قیمت فروش به تومان.
+  /// برای نسخه‌های دلاری این عدد «نتیجه‌ی محاسبه» است و با هر تغییر نرخ
+  /// دوباره نوشته می‌شود — بقیه‌ی سایت فقط همین را می‌خواند.
   price          Int
   /// قیمت قبل از تخفیف؛ اگر بزرگ‌تر از price باشد، تخفیف نمایش داده می‌شود
   compareAtPrice Int?
+
+  /// قیمت دلاری به «سِنت» تا عدد اعشاری نداشته باشیم (۵۰۰ یعنی ۵ دلار)
+  priceUsd     Int?
+  compareAtUsd Int?
+  /// true یعنی قیمت تومانی از روی نرخ دلار حساب می‌شود، نه دستی
+  usdPriced    Boolean @default(false)
+
   stock          Int     @default(0)
   isActive       Boolean @default(true)
 
@@ -232,6 +271,7 @@ model ProductVariant {
 
   @@index([productId])
   @@index([platform, region])
+  @@index([usdPriced])
 }
 
 model Order {

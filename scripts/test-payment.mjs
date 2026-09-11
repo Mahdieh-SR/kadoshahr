@@ -142,7 +142,11 @@ async function createOrder(jar, variantId, quantity = 1) {
 const { rows: variants } = await db.query(
   `select v.id, v.price, v.stock, p.title
      from "ProductVariant" v join "Product" p on p.id = v."productId"
-    where v.stock > 5 order by v.price asc limit 1`
+    -- فقط چیزی که مشتری واقعی می‌تواند بخرد. بدون این شرط، تست ممکن است
+    -- سراغ محصول بایگانی‌شده یا نسخه‌ی غیرفعال برود و بعد تسویه‌حساب —
+    -- که درست عمل می‌کند و ردش می‌کند — باعث شکست کل تست شود.
+    where v.stock > 5 and v."isActive" and p."isActive"
+    order by v.price asc limit 1`
 );
 const variant = variants[0];
 console.log(

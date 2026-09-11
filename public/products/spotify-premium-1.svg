@@ -1,13 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
-  <rect width="800" height="600" fill="#14122a"/>
+  <rect width="800" height="600" fill="#ffffff"/>
   
-  <circle cx="660" cy="90" r="190" fill="#1ed760" opacity="0.10"/>
-  <circle cx="120" cy="540" r="150" fill="#1ed760" opacity="0.07"/>
+  <circle cx="660" cy="90" r="190" fill="#1ed760" opacity="0.16"/>
+  <circle cx="120" cy="540" r="150" fill="#1ed760" opacity="0.12"/>
   <rect x="160" y="150" width="480" height="300" rx="26" fill="#0b0917" stroke="#1ed760" stroke-width="2" opacity="0.98"/>
   <rect x="160" y="150" width="480" height="10" rx="5" fill="#1ed760"/>
   <rect x="196" y="356" width="150" height="14" rx="7" fill="#1ed760" opacity="0.55"/>
   <rect x="196" y="386" width="96" height="14" rx="7" fill="#ffffff" opacity="0.16"/>
   <circle cx="576" cy="378" r="30" fill="#1ed760" opacity="0.85"/>
-  <text x="400" y="290" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#ffffff" text-anchor="middle">Spotify</text>
+  <image href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMWVkNzYwIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+U3BvdGlmeTwvdGl0bGU+PHBhdGggZD0iTTEyIDBDNS40IDAgMCA1LjQgMCAxMnM1LjQgMTIgMTIgMTIgMTItNS40IDEyLTEyUzE4LjY2IDAgMTIgMHptNS41MjEgMTcuMzRjLS4yNC4zNTktLjY2LjQ4LTEuMDIxLjI0LTIuODItMS43NC02LjM2LTIuMTAxLTEwLjU2MS0xLjE0MS0uNDE4LjEyMi0uNzc5LS4xNzktLjg5OS0uNTM5LS4xMi0uNDIxLjE4LS43OC41NC0uOSA0LjU2LTEuMDIxIDguNTItLjYgMTEuNjQgMS4zMi40Mi4xOC40NzkuNjU5LjMwMSAxLjAyem0xLjQ0LTMuM2MtLjMwMS40Mi0uODQxLjYtMS4yNjIuMy0zLjIzOS0xLjk4LTguMTU5LTIuNTgtMTEuOTM5LTEuMzgtLjQ3OS4xMi0xLjAyLS4xMi0xLjE0LS42LS4xMi0uNDguMTItMS4wMjEuNi0xLjE0MUM5LjYgOS45IDE1IDEwLjU2MSAxOC43MiAxMi44NGMuMzYxLjE4MS41NC43OC4yNDEgMS4yem0uMTItMy4zNkMxNS4yNCA4LjQgOC44MiA4LjE2IDUuMTYgOS4zMDFjLS42LjE3OS0xLjItLjE4MS0xLjM4LS43MjEtLjE4LS42MDEuMTgtMS4yLjcyLTEuMzgxIDQuMjYtMS4yNiAxMS4yOC0xLjAyIDE1LjcyMSAxLjYyMS41MzkuMy43MTkgMS4wMi40MTkgMS41Ni0uMjk5LjQyMS0xLjAyLjU5OS0xLjU1OS4zeiIvPjwvc3ZnPgo=" x="362" y="183" width="76" height="76"/>
+  <text x="400" y="315" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#ffffff" text-anchor="middle">Spotify</text>
 
 </svg>

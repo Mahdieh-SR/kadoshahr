@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <image href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmY0ZDY3IiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QXBwbGUgTmV3czwvdGl0bGU+PHBhdGggZD0iTTAgMTIuOTQwMWMyLjcyNiA0LjY3MjYgNi4zOTQ0IDguMzg1IDExLjAzOSAxMS4wNTgySDEuNDE2NEMuNjM0IDIzLjk5ODMgMCAyMy4zNjM5IDAgMjIuNTgxOXYtOS42NDE4Wk0wIDEuNDEzOEMwIC42MzM3LjYzMi4wMDE4IDEuNDExNi4wMDE4aDQuODA4MkwyNCAxNy43NTgzdjQuNzczYzAgLjM4OTEtLjE1NDQuNzYyLS40Mjk1IDEuMDM3M2ExLjQ2NzQgMS40Njc0IDAgMCAxLTEuMDM3LjQyOTZoLTQuNzc0TDAgNi4yNDE2TTEyLjk2MzQuMDAxN2g5LjYxODJBMS40MTg3IDEuNDE4NyAwIDAgMSAyNCAxLjQyMDV2OS42MjU2QzIxLjI2NDggNi40OTM1IDE3LjYxNTcgMi43NzQ1IDEyLjk2MzQuMDAxN1oiLz48L3N2Zz4K" x="362" y="158" width="76" height="76"/>
+  <text x="400" y="290" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#0b0917" text-anchor="middle">Apple News+</text>
+  <g opacity="0.95">
+    <rect x="250" y="400" width="44" height="90" rx="22" fill="#ff4d67" opacity="0.35"/>
+    <rect x="312" y="370" width="44" height="120" rx="22" fill="#ff4d67" opacity="0.55"/>
+    <rect x="374" y="340" width="44" height="150" rx="22" fill="#ff4d67" opacity="0.9"/>
+    <rect x="436" y="370" width="44" height="120" rx="22" fill="#ff4d67" opacity="0.55"/>
+    <rect x="498" y="400" width="44" height="90" rx="22" fill="#ff4d67" opacity="0.35"/>
+  </g>
+
+</svg>

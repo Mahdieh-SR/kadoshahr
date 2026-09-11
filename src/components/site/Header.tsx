@@ -8,7 +8,9 @@ import { SearchIcon, SettingsIcon, UserIcon } from "@/components/ui/icons";
 export async function Header() {
   const [session, categories] = await Promise.all([
     auth(),
+    // دسته‌ی بدون محصول در منو نمی‌آید — کلیک روی آن به صفحه‌ی خالی می‌رسید
     prisma.category.findMany({
+      where: { products: { some: { isActive: true } } },
       orderBy: { sortOrder: "asc" },
       select: { name: true, slug: true },
     }),
@@ -24,9 +26,9 @@ export async function Header() {
       <div className="container-page flex h-16 items-center gap-4">
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-400 text-sm font-black text-ink-950">
-            گ
+            ک
           </span>
-          <span className="text-lg font-bold tracking-tight">گیفت‌لند</span>
+          <span className="text-lg font-bold tracking-tight">کادوشهر</span>
         </Link>
 
         <nav className="hidden flex-1 items-center gap-1 md:flex">

@@ -6,10 +6,11 @@ import { NextResponse, type NextRequest } from "next/server";
  *  ۱. هدرهای امنیتی را روی همه‌ی پاسخ‌ها می‌گذارد
  *  ۲. مسیرهای خصوصی را قبل از رندر شدن قفل می‌کند
  *
- * ⚠️ چرا هدرها اینجا و نه در next.config؟
- * سرور لیارا هنگام بیلد، فایل next.config خودش را جایگزین فایل ما می‌کند
- * (برای تنظیم standalone) و در نتیجه بخش headers ما از بین می‌رفت.
- * اینجا دست‌نخورده باقی می‌ماند و روی هر سروری کار می‌کند.
+ * ⚠️ چرا هدرها اینجا و نه فقط در next.config؟
+ * یک سرویس ابری می‌تواند هنگام بیلد فایل next.config خودش را جایگزین کند و
+ * بخش headers ما را از بین ببرد — دقیقاً همین روی سرور قبلی اتفاق افتاد و
+ * هدرهای امنیتی روی سایت زنده اعمال نمی‌شدند در حالی که محلی درست بودند.
+ * این فایل دست‌نخورده باقی می‌ماند و روی هر سروری کار می‌کند.
  */
 
 /** هدرهای امنیتی — هرکدام جلوی یک نوع حمله‌ی رایج را می‌گیرد */
@@ -51,7 +52,7 @@ function withSecurityHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const needsAuth = PROTECTED.some(

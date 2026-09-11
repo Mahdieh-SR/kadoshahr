@@ -82,7 +82,10 @@ const randomPhone = (p = "0918") =>
 const { rows: vs } = await db.query(
   `select v.id as "variantId", v."productId", p.slug, p.title
      from "ProductVariant" v join "Product" p on p.id = v."productId"
-    where v.stock > 3 order by v.price asc limit 1`
+    -- فقط نسخه‌ی قابل خرید — وگرنه تسویه‌حساب محصول غیرفعال را رد می‌کند
+    -- و تست نظرات هم که به یک خرید واقعی نیاز دارد، پشت سرش می‌شکند.
+    where v.stock > 3 and v."isActive" and p."isActive"
+    order by v.price asc limit 1`
 );
 const target = vs[0];
 const items = [{ variantId: target.variantId, quantity: 1 }];

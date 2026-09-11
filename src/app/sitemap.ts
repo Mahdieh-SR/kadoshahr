@@ -1,7 +1,10 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { baseUrl as base } from "@/lib/base-url";
 
-const base = () => process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+// بدون این، Next نقشه را موقع بیلد می‌سازد — با آدرس اشتباه و بدون
+// محصولاتی که بعداً اضافه می‌شوند.
+export const dynamic = "force-dynamic";
 
 /**
  * نقشه‌ی سایت برای موتورهای جستجو — فقط صفحه‌های عمومی.
@@ -13,11 +16,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: root, changeFrequency: "daily", priority: 1 },
     { url: `${root}/products`, changeFrequency: "daily", priority: 0.9 },
+    // صفحه‌های ثابت — محتوایشان به‌ندرت عوض می‌شود ولی برای اعتماد کاربر و
+    // ارزیابی گوگل مهم‌اند، پس باید در نقشه‌ی سایت باشند.
+    { url: `${root}/about`, changeFrequency: "monthly" as const, priority: 0.5 },
+    { url: `${root}/contact`, changeFrequency: "monthly" as const, priority: 0.5 },
   ];
 
   try {
     const [categories, products] = await Promise.all([
-      prisma.category.findMany({ select: { slug: true } }),
+      prisma.category.findMany({
+        where: { products: { some: { isActive: true } } },
+        select: { slug: true },
+      }),
       prisma.product.findMany({
         where: { isActive: true },
         select: { slug: true, updatedAt: true },

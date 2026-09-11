@@ -20,8 +20,8 @@ export type CartLine = {
   quantity: number;
 };
 
-const STORAGE_KEY = "giftland.cart.v1";
-const COUPON_KEY = "giftland.coupon.v1";
+const STORAGE_KEY = "kadoshahr.cart.v1";
+const COUPON_KEY = "kadoshahr.coupon.v1";
 export const MAX_QTY_PER_ITEM = 10;
 
 type CartContextValue = {

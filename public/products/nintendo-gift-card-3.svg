@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <text x="400" y="250" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#0b0917" text-anchor="middle">Nintendo</text>
+  <g opacity="0.95">
+    <rect x="250" y="400" width="44" height="90" rx="22" fill="#e60012" opacity="0.35"/>
+    <rect x="312" y="370" width="44" height="120" rx="22" fill="#e60012" opacity="0.55"/>
+    <rect x="374" y="340" width="44" height="150" rx="22" fill="#e60012" opacity="0.9"/>
+    <rect x="436" y="370" width="44" height="120" rx="22" fill="#e60012" opacity="0.55"/>
+    <rect x="498" y="400" width="44" height="90" rx="22" fill="#e60012" opacity="0.35"/>
+  </g>
+
+</svg>

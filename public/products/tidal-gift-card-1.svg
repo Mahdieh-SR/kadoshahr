@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <circle cx="660" cy="90" r="190" fill="#00d3d3" opacity="0.16"/>
+  <circle cx="120" cy="540" r="150" fill="#00d3d3" opacity="0.12"/>
+  <rect x="160" y="150" width="480" height="300" rx="26" fill="#0b0917" stroke="#00d3d3" stroke-width="2" opacity="0.98"/>
+  <rect x="160" y="150" width="480" height="10" rx="5" fill="#00d3d3"/>
+  <rect x="196" y="356" width="150" height="14" rx="7" fill="#00d3d3" opacity="0.55"/>
+  <rect x="196" y="386" width="96" height="14" rx="7" fill="#ffffff" opacity="0.16"/>
+  <circle cx="576" cy="378" r="30" fill="#00d3d3" opacity="0.85"/>
+  <image href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDBkM2QzIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+VElEQUw8L3RpdGxlPjxwYXRoIGQ9Ik0xMi4wMTIgMy45OTJMOC4wMDggNy45OTYgNC4wMDQgMy45OTIgMCA3Ljk5NiA0LjAwNCAxMmw0LjAwNC00LjAwNEwxMi4wMTIgMTJsLTQuMDA0IDQuMDA0IDQuMDA0IDQuMDA0IDQuMDA0LTQuMDA0TDEyLjAxMiAxMmw0LjAwNC00LjAwNC00LjAwNC00LjAwNHpNMTYuMDQyIDcuOTk2bDMuOTc5LTMuOTc5TDI0IDcuOTk2bC0zLjk3OSAzLjk3OXoiLz48L3N2Zz4K" x="362" y="183" width="76" height="76"/>
+  <text x="400" y="315" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#ffffff" text-anchor="middle">Tidal</text>
+
+</svg>

@@ -9,9 +9,18 @@ import {
   adminProductSchema,
   adminReviewSchema,
   adminUpdateOrderSchema,
+  adminUsdRateSchema,
 } from "@/lib/validation";
 import { recalculateProductRating } from "@/lib/reviews";
 import { normalizeDiscountCode } from "@/lib/discount";
+import {
+  compareTomanFromUsd,
+  fetchSuggestedRate,
+  getPricingSettings,
+  isSuspiciousJump,
+  repriceUsdVariants,
+  tomanFromUsd,
+} from "@/lib/exchange-rate";
 
 export type AdminResult = { ok: boolean; message?: string; error?: string };
 
@@ -80,6 +89,16 @@ export async function updateOrderStatus(input: unknown): Promise<AdminResult> {
 
 /* ─────────────────────────── محصول‌ها ─────────────────────────── */
 
+/** هر محور فقط یک بار — عنوان تکراری برای یک محور بی‌معنی است */
+function dedupeAxes<T extends { axis: string }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.axis)) return false;
+    seen.add(item.axis);
+    return true;
+  });
+}
+
 export async function saveProduct(input: unknown): Promise<AdminResult & { id?: string }> {
   const { admin, error } = await guard("product");
   if (!admin) return error!;
@@ -119,18 +138,54 @@ export async function saveProduct(input: unknown): Promise<AdminResult & { id?: 
     isActive: data.isActive,
     isFeatured: data.isFeatured,
     specs: data.specs?.filter((s) => s.key && s.value) ?? [],
+    // یک محور نباید دو بار عنوان بگیرد؛ اولی برنده است
+    optionLabels: dedupeAxes(data.optionLabels ?? []),
   };
 
-  const variantData = data.variants.map((v) => ({
-    label: v.label,
-    platform: v.platform,
-    region: v.region,
-    capacity: v.capacity,
-    price: v.price,
-    compareAtPrice: v.compareAtPrice && v.compareAtPrice > 0 ? v.compareAtPrice : null,
-    stock: v.stock,
-    isActive: v.isActive,
-  }));
+  // نسخه‌های دلاری قیمت تومانی‌شان را از نرخ روز می‌گیرند، نه از فرم.
+  const usesUsd = data.variants.some((v) => v.usdPriced);
+  const settings = usesUsd ? await getPricingSettings() : null;
+
+  if (settings && settings.usdRate <= 0) {
+    return {
+      ok: false,
+      error: "برای قیمت دلاری، اول نرخ دلار را در صفحه‌ی «نرخ دلار» تنظیم کنید.",
+    };
+  }
+
+  const variantData = data.variants.map((v) => {
+    const base = {
+      label: v.label,
+      platform: v.platform,
+      region: v.region,
+      capacity: v.capacity,
+      stock: v.stock,
+      isActive: v.isActive,
+    };
+
+    // ⚠️ قیمت تومانی نسخه‌ی دلاری هرگز از فرم خوانده نمی‌شود؛ سرور خودش
+    // از روی قیمت دلاری و نرخ روز حسابش می‌کند.
+    if (v.usdPriced && v.priceUsd && settings) {
+      const { usdRate, marginPercent, roundTo } = settings;
+      return {
+        ...base,
+        usdPriced: true,
+        priceUsd: v.priceUsd,
+        compareAtUsd: v.compareAtUsd && v.compareAtUsd > 0 ? v.compareAtUsd : null,
+        price: tomanFromUsd(v.priceUsd, usdRate, marginPercent, roundTo),
+        compareAtPrice: compareTomanFromUsd(v.compareAtUsd, usdRate, marginPercent, roundTo),
+      };
+    }
+
+    return {
+      ...base,
+      usdPriced: false,
+      priceUsd: null,
+      compareAtUsd: null,
+      price: v.price,
+      compareAtPrice: v.compareAtPrice && v.compareAtPrice > 0 ? v.compareAtPrice : null,
+    };
+  });
 
   /* ── محصول جدید ── */
   if (!data.id) {
@@ -387,4 +442,98 @@ export async function deleteReview(reviewId: string): Promise<AdminResult> {
   revalidatePath(`/product/${review.product.slug}`);
 
   return { ok: true, message: "نظر حذف شد." };
+}
+
+/* ─────────────────────────── نرخ دلار ─────────────────────────── */
+
+export type UsdRateResult = AdminResult & {
+  /** وقتی نرخ جهش غیرعادی دارد و منتظر تایید دوباره‌ی مدیر است */
+  needsConfirm?: boolean;
+  changed?: number;
+};
+
+/**
+ * نرخ دلار را ذخیره می‌کند و قیمت تومانی همه‌ی نسخه‌های دلاری را بازنویسی می‌کند.
+ *
+ * ⚠️ نکته‌ی امنیتی: مثل بقیه‌ی اکشن‌های ادمین، نقش داخل خود اکشن بررسی می‌شود
+ * نه فقط در layout — چون Server Action از بیرون هم قابل فراخوانی است.
+ */
+export async function saveUsdRate(input: unknown): Promise<UsdRateResult> {
+  const { admin, error } = await guard("pricing");
+  if (!admin) return error!;
+
+  const parsed = adminUsdRateSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "مقادیر وارد شده معتبر نیست." };
+  }
+
+  const { usdRate, marginPercent, roundTo, confirmJump } = parsed.data;
+  const current = await getPricingSettings();
+
+  // کمربند ایمنی: جهش بزرگ نرخ بدون تایید صریح اعمال نمی‌شود.
+  // دلیل: یک صفر اضافه یا کم هنگام تایپ، یعنی فروش کل فروشگاه به یک‌دهم قیمت.
+  if (!confirmJump && isSuspiciousJump(current.usdRate, usdRate)) {
+    return {
+      ok: false,
+      needsConfirm: true,
+      error:
+        `نرخ جدید (${usdRate.toLocaleString("fa-IR")} تومان) با نرخ فعلی ` +
+        `(${current.usdRate.toLocaleString("fa-IR")} تومان) تفاوت زیادی دارد. ` +
+        `اگر درست است، دوباره روی ذخیره بزنید تا اعمال شود.`,
+    };
+  }
+
+  const changed = await repriceUsdVariants(usdRate, marginPercent, roundTo);
+
+  await prisma.pricingSettings.update({
+    where: { id: 1 },
+    data: { usdRate, marginPercent, roundTo, appliedAt: new Date() },
+  });
+
+  revalidatePath("/admin/pricing");
+  revalidatePath("/admin/products");
+  revalidatePath("/products");
+  revalidatePath("/");
+
+  return {
+    ok: true,
+    changed,
+    message:
+      changed > 0
+        ? `نرخ ذخیره شد و قیمت ${changed} نسخه به‌روز شد.`
+        : "نرخ ذخیره شد. هنوز هیچ محصولی قیمت دلاری ندارد.",
+  };
+}
+
+/**
+ * نرخ روز را از سرویس بیرونی می‌گیرد و فقط به‌عنوان «پیشنهاد» ذخیره می‌کند.
+ * هیچ قیمتی با این کار عوض نمی‌شود — تا مدیر تاییدش نکند.
+ */
+export async function refreshSuggestedRate(): Promise<
+  AdminResult & { rate?: number; source?: string; note?: string }
+> {
+  const { admin, error } = await guard("pricing");
+  if (!admin) return error!;
+
+  const result = await fetchSuggestedRate();
+  if (!result.ok) return { ok: false, error: result.error };
+
+  await prisma.pricingSettings.update({
+    where: { id: 1 },
+    data: {
+      suggestedRate: result.rate,
+      suggestedAt: new Date(),
+      suggestedFrom: result.source,
+    },
+  });
+
+  revalidatePath("/admin/pricing");
+
+  return {
+    ok: true,
+    rate: result.rate,
+    source: result.source,
+    note: result.note,
+    message: `نرخ پیشنهادی: ${result.rate.toLocaleString("fa-IR")} تومان`,
+  };
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Vazirmatn } from "next/font/google";
 import { CartProvider } from "@/components/cart/CartProvider";
 import "./globals.css";
+import { baseUrl } from "@/lib/base-url";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
@@ -9,13 +10,13 @@ const vazirmatn = Vazirmatn({
   variable: "--font-vazirmatn",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+const siteUrl = baseUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "گیفت‌لند — خرید گیفت‌کارت و اکانت دیجیتال",
-    template: "%s | گیفت‌لند",
+    default: "کادوشهر — خرید گیفت‌کارت و اکانت دیجیتال",
+    template: "%s | کادوشهر",
   },
   description:
     "خرید آنی گیفت‌کارت و اکانت‌های دیجیتال با تحویل سریع و پشتیبانی واقعی.",
@@ -29,8 +30,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fa_IR",
-    siteName: "گیفت‌لند",
-    title: "گیفت‌لند — خرید گیفت‌کارت و اکانت دیجیتال",
+    siteName: "کادوشهر",
+    title: "کادوشهر — خرید گیفت‌کارت و اکانت دیجیتال",
     description:
       "خرید آنی گیفت‌کارت و اکانت‌های دیجیتال با تحویل سریع و پشتیبانی واقعی.",
   },

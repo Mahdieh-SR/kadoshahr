@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <circle cx="660" cy="90" r="190" fill="#e50914" opacity="0.16"/>
+  <circle cx="120" cy="540" r="150" fill="#e50914" opacity="0.12"/>
+  <rect x="160" y="150" width="480" height="300" rx="26" fill="#0b0917" stroke="#e50914" stroke-width="2" opacity="0.98"/>
+  <rect x="160" y="150" width="480" height="10" rx="5" fill="#e50914"/>
+  <rect x="196" y="356" width="150" height="14" rx="7" fill="#e50914" opacity="0.55"/>
+  <rect x="196" y="386" width="96" height="14" rx="7" fill="#ffffff" opacity="0.16"/>
+  <circle cx="576" cy="378" r="30" fill="#e50914" opacity="0.85"/>
+  <image href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZTUwOTE0IiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+TmV0ZmxpeDwvdGl0bGU+PHBhdGggZD0ibTUuMzk4IDAgOC4zNDggMjMuNjAyYzIuMzQ2LjA1OSA0Ljg1Ni4zOTggNC44NTYuMzk4TDEwLjExMyAwSDUuMzk4em04LjQ4OSAwdjkuMTcybDQuNzE1IDEzLjMzVjBoLTQuNzE1ek01LjM5OCAxLjVWMjRjMS44NzMtLjIyNSAyLjgxLS4zMTIgNC43MTUtLjM5OFYxNC44M0w1LjM5OCAxLjV6Ii8+PC9zdmc+Cg==" x="362" y="183" width="76" height="76"/>
+  <text x="400" y="315" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#ffffff" text-anchor="middle">Netflix</text>
+
+</svg>

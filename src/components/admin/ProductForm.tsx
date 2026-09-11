@@ -10,6 +10,7 @@ import {
   TrashIcon,
 } from "@/components/ui/icons";
 import { formatNumber, toLatinDigits } from "@/lib/format";
+import type { OptionAxis } from "@/components/product/VariantPicker";
 
 export type VariantDraft = {
   id?: string;
@@ -18,8 +19,20 @@ export type VariantDraft = {
   capacity: string;
   price: string;
   compareAtPrice: string;
+  /** true یعنی قیمت تومانی از روی نرخ دلار حساب شود، نه دستی */
+  usdPriced: boolean;
+  /** به دلار و با اعشار، همان‌طور که مدیر تایپ می‌کند («۹.۹۹») */
+  priceUsd: string;
+  compareAtUsd: string;
   stock: string;
   isActive: boolean;
+};
+
+/** تنظیمات نرخ — فقط برای نمایش پیش‌نمایش قیمت. عدد نهایی را همیشه سرور می‌نویسد. */
+export type PricingInfo = {
+  usdRate: number;
+  marginPercent: number;
+  roundTo: number;
 };
 
 export type ProductDraft = {
@@ -32,6 +45,8 @@ export type ProductDraft = {
   isActive: boolean;
   isFeatured: boolean;
   specs: { key: string; value: string }[];
+  /** عنوان و ترتیب کادرهای انتخاب — ترتیب همان چیزی است که مشتری می‌بیند */
+  optionLabels: { axis: OptionAxis; label: string }[];
   variants: VariantDraft[];
 };
 
@@ -41,18 +56,44 @@ export const emptyVariant: VariantDraft = {
   capacity: "",
   price: "",
   compareAtPrice: "",
+  usdPriced: false,
+  priceUsd: "",
+  compareAtUsd: "",
   stock: "0",
   isActive: true,
 };
 
 const digits = (v: string) => toLatinDigits(v).replace(/\D/g, "");
 
+/** ورودی دلاری: رقم و حداکثر یک نقطه‌ی اعشار (٫ فارسی هم قبول است) */
+const decimal = (v: string) =>
+  toLatinDigits(v)
+    .replace(/٫/g, ".")
+    .replace(/[^\d.]/g, "")
+    .replace(/^(\d*\.?\d{0,2}).*$/, "$1");
+
+/** «۹.۹۹» → ۹۹۹ سِنت */
+const toCents = (v: string) => {
+  const n = Number(decimal(v));
+  return Number.isFinite(n) && n > 0 ? Math.round(n * 100) : 0;
+};
+
+/** همان فرمول سرور — فقط پیش‌نمایش */
+function previewToman(cents: number, p: PricingInfo): number {
+  if (cents <= 0 || p.usdRate <= 0) return 0;
+  const step = p.roundTo > 0 ? Math.floor(p.roundTo) : 1;
+  const raw = (cents * p.usdRate * (100 + p.marginPercent)) / 10000;
+  return Math.max(1000, Math.ceil(raw / step) * step);
+}
+
 export function ProductForm({
   initial,
   categories,
+  pricing,
 }: {
   initial: ProductDraft;
   categories: { id: string; name: string }[];
+  pricing: PricingInfo;
 }) {
   const router = useRouter();
   const [draft, setDraft] = useState<ProductDraft>(initial);
@@ -90,14 +131,19 @@ export function ProductForm({
       isActive: draft.isActive,
       isFeatured: draft.isFeatured,
       specs: draft.specs.filter((s) => s.key.trim() && s.value.trim()),
+      optionLabels: draft.optionLabels.filter((o) => o.label.trim()),
       variants: draft.variants.map((v) => ({
         ...(v.id ? { id: v.id } : {}),
         label: `${v.platform} — ${v.region} — ${v.capacity}`,
         platform: v.platform,
         region: v.region,
         capacity: v.capacity,
+        // برای نسخه‌ی دلاری، این دو عدد را سرور دور می‌ریزد و خودش حساب می‌کند
         price: Number(digits(v.price) || 0),
         compareAtPrice: v.compareAtPrice ? Number(digits(v.compareAtPrice)) : null,
+        usdPriced: v.usdPriced,
+        priceUsd: v.usdPriced ? toCents(v.priceUsd) : null,
+        compareAtUsd: v.usdPriced ? toCents(v.compareAtUsd) : null,
         stock: Number(digits(v.stock) || 0),
         isActive: v.isActive,
       })),
@@ -227,9 +273,9 @@ export function ProductForm({
       {/* ── تصاویر ── */}
       <Card title="تصاویر">
         <p className="mb-4 text-xs leading-6 text-muted">
-          آدرس تصویر را وارد کنید. می‌تواند فایل داخل پوشه‌ی public باشد (مثل{" "}
-          <code dir="ltr">/products/steam-1.svg</code>) یا لینک کامل اینترنتی.
-          تصویر اول، تصویر اصلی کارت محصول است.
+          فایل تصویر را آپلود کنید، یا آدرس آن را دستی وارد کنید (فایل داخل
+          پوشه‌ی public مثل <code dir="ltr">/products/steam-1.svg</code>، یا لینک
+          کامل اینترنتی). تصویر اول، تصویر اصلی کارت محصول است.
         </p>
 
         <div className="flex flex-col gap-3">
@@ -322,6 +368,95 @@ export function ProductForm({
         />
       </Card>
 
+      {/* ── کادرهای انتخاب ── */}
+      <Card title="کادرهای انتخاب در صفحه‌ی محصول">
+        <p className="mb-4 text-xs leading-6 text-muted">
+          مشتری برای انتخاب نسخه، این کادرها را می‌بیند. عنوانشان را خودتان
+          می‌نویسید — مثلاً برای گیفت‌کارت «گیفت کارت» و برای اشتراک «مدت زمان
+          اشتراک». هر کادری که اینجا نباشد در صفحه دیده نمی‌شود.
+          <br />
+          اگر هیچ‌کدام را انتخاب نکنید، عنوان‌های پیش‌فرض نمایش داده می‌شوند.
+        </p>
+
+        <div className="flex flex-col gap-3">
+          {draft.optionLabels.map((opt, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <span className="relative block sm:w-56">
+                <select
+                  value={opt.axis}
+                  onChange={(e) =>
+                    set(
+                      "optionLabels",
+                      draft.optionLabels.map((o, idx) =>
+                        idx === i ? { ...o, axis: e.target.value as OptionAxis } : o
+                      )
+                    )
+                  }
+                  className={`${input} appearance-none ps-4 pe-10`}
+                >
+                  <option value="platform" className="bg-ink-900">
+                    پلتفرم
+                  </option>
+                  <option value="region" className="bg-ink-900">
+                    ریجن
+                  </option>
+                  <option value="capacity" className="bg-ink-900">
+                    حجم / مدت
+                  </option>
+                </select>
+                <ChevronDownIcon
+                  width={18}
+                  height={18}
+                  className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted"
+                />
+              </span>
+
+              <input
+                value={opt.label}
+                onChange={(e) =>
+                  set(
+                    "optionLabels",
+                    draft.optionLabels.map((o, idx) =>
+                      idx === i ? { ...o, label: e.target.value } : o
+                    )
+                  )
+                }
+                maxLength={40}
+                placeholder="عنوانی که مشتری می‌بیند (مثلاً: مدت زمان اشتراک)"
+                className={input}
+              />
+
+              <IconButton
+                label="حذف کادر"
+                onClick={() =>
+                  set(
+                    "optionLabels",
+                    draft.optionLabels.filter((_, idx) => idx !== i)
+                  )
+                }
+              />
+            </div>
+          ))}
+        </div>
+
+        <AddButton
+          label="افزودن کادر"
+          disabled={draft.optionLabels.length >= 3}
+          onClick={() =>
+            set("optionLabels", [
+              ...draft.optionLabels,
+              {
+                axis:
+                  (["capacity", "platform", "region"] as OptionAxis[]).find(
+                    (a) => !draft.optionLabels.some((o) => o.axis === a)
+                  ) ?? "capacity",
+                label: "",
+              },
+            ])
+          }
+        />
+      </Card>
+
       {/* ── وردایانت‌ها ── */}
       <Card title="نسخه‌ها و قیمت‌ها">
         <p className="mb-4 text-xs leading-6 text-muted">
@@ -341,6 +476,11 @@ export function ProductForm({
                   {variant.id ? "" : " (جدید)"}
                 </span>
                 <div className="flex items-center gap-3">
+                  <Toggle
+                    label="قیمت دلاری"
+                    checked={variant.usdPriced}
+                    onChange={(v) => setVariant(i, { usdPriced: v })}
+                  />
                   <Toggle
                     label="فعال"
                     checked={variant.isActive}
@@ -394,40 +534,102 @@ export function ProductForm({
               </div>
 
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
-                <Field label="قیمت (تومان)" small>
-                  <input
-                    value={variant.price ? formatNumber(Number(variant.price)) : ""}
-                    onChange={(e) => setVariant(i, { price: digits(e.target.value) })}
-                    inputMode="numeric"
-                    required
-                    placeholder="۳٬۸۰۰٬۰۰۰"
-                    className={input}
-                  />
-                </Field>
-                <Field label="قیمت قبل از تخفیف" small>
-                  <input
-                    value={
-                      variant.compareAtPrice
-                        ? formatNumber(Number(variant.compareAtPrice))
-                        : ""
-                    }
-                    onChange={(e) =>
-                      setVariant(i, { compareAtPrice: digits(e.target.value) })
-                    }
-                    inputMode="numeric"
-                    placeholder="اختیاری"
-                    className={input}
-                  />
-                </Field>
-                <Field label="موجودی" small>
-                  <input
-                    value={variant.stock ? formatNumber(Number(variant.stock)) : "۰"}
-                    onChange={(e) => setVariant(i, { stock: digits(e.target.value) })}
-                    inputMode="numeric"
-                    className={input}
-                  />
-                </Field>
+                {variant.usdPriced ? (
+                  <>
+                    <Field label="قیمت (دلار)" small>
+                      <input
+                        value={variant.priceUsd}
+                        onChange={(e) =>
+                          setVariant(i, { priceUsd: decimal(e.target.value) })
+                        }
+                        inputMode="decimal"
+                        dir="ltr"
+                        required
+                        placeholder="9.99"
+                        className={`${input} text-start`}
+                      />
+                    </Field>
+                    <Field label="قیمت قبل از تخفیف (دلار)" small>
+                      <input
+                        value={variant.compareAtUsd}
+                        onChange={(e) =>
+                          setVariant(i, { compareAtUsd: decimal(e.target.value) })
+                        }
+                        inputMode="decimal"
+                        dir="ltr"
+                        placeholder="اختیاری"
+                        className={`${input} text-start`}
+                      />
+                    </Field>
+                    <Field label="موجودی" small>
+                      <input
+                        value={variant.stock ? formatNumber(Number(variant.stock)) : "۰"}
+                        onChange={(e) => setVariant(i, { stock: digits(e.target.value) })}
+                        inputMode="numeric"
+                        className={input}
+                      />
+                    </Field>
+                  </>
+                ) : (
+                  <>
+                    <Field label="قیمت (تومان)" small>
+                      <input
+                        value={variant.price ? formatNumber(Number(variant.price)) : ""}
+                        onChange={(e) => setVariant(i, { price: digits(e.target.value) })}
+                        inputMode="numeric"
+                        required
+                        placeholder="۳٬۸۰۰٬۰۰۰"
+                        className={input}
+                      />
+                    </Field>
+                    <Field label="قیمت قبل از تخفیف" small>
+                      <input
+                        value={
+                          variant.compareAtPrice
+                            ? formatNumber(Number(variant.compareAtPrice))
+                            : ""
+                        }
+                        onChange={(e) =>
+                          setVariant(i, { compareAtPrice: digits(e.target.value) })
+                        }
+                        inputMode="numeric"
+                        placeholder="اختیاری"
+                        className={input}
+                      />
+                    </Field>
+                    <Field label="موجودی" small>
+                      <input
+                        value={variant.stock ? formatNumber(Number(variant.stock)) : "۰"}
+                        onChange={(e) => setVariant(i, { stock: digits(e.target.value) })}
+                        inputMode="numeric"
+                        className={input}
+                      />
+                    </Field>
+                  </>
+                )}
               </div>
+
+              {variant.usdPriced && (
+                <p className="mt-3 rounded-xl bg-ink-950 p-3 text-[11px] text-muted">
+                  {pricing.usdRate <= 0 ? (
+                    <>
+                      هنوز نرخ دلار تنظیم نشده است. اول به صفحه‌ی{" "}
+                      <b className="text-fg">نرخ دلار</b> بروید.
+                    </>
+                  ) : toCents(variant.priceUsd) > 0 ? (
+                    <>
+                      قیمت فروش:{" "}
+                      <b className="text-fg">
+                        {formatNumber(previewToman(toCents(variant.priceUsd), pricing))}{" "}
+                        تومان
+                      </b>{" "}
+                      — با تغییر نرخ دلار خودکار به‌روز می‌شود.
+                    </>
+                  ) : (
+                    "قیمت دلاری را وارد کنید تا معادل تومانی‌اش را ببینید."
+                  )}
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -536,7 +738,6 @@ function Toggle({
     </label>
   );
 }
-
 function IconButton({
   label,
   onClick,

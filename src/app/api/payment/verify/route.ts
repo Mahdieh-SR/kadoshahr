@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyPayment } from "@/lib/zarinpal";
+import { baseUrl } from "@/lib/base-url";
 
 /**
  * ─────────────────────────────────────────────────────────────
@@ -18,7 +19,7 @@ import { verifyPayment } from "@/lib/zarinpal";
  * ─────────────────────────────────────────────────────────────
  */
 
-const base = () => process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+const base = () => baseUrl();
 
 function redirectTo(path: string) {
   return NextResponse.redirect(new URL(path, base()));

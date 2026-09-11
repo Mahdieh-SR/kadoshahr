@@ -194,17 +194,67 @@ export const adminDiscountSchema = z
 
 export type AdminDiscountInput = z.infer<typeof adminDiscountSchema>;
 
-const variantInputSchema = z.object({
-  id: z.string().max(64).optional(),
-  label: z.string().trim().min(1, "عنوان وردایانت لازم است").max(80),
-  platform: z.string().trim().min(1, "پلتفرم لازم است").max(40),
-  region: z.string().trim().min(1, "ریجن لازم است").max(40),
-  capacity: z.string().trim().min(1, "حجم/مقدار لازم است").max(40),
-  price: z.number().int().min(1000, "قیمت باید حداقل ۱٬۰۰۰ تومان باشد").max(1_000_000_000),
-  compareAtPrice: z.number().int().min(0).max(1_000_000_000).nullable().optional(),
-  stock: z.number().int().min(0).max(100000),
-  isActive: z.boolean(),
+const variantInputSchema = z
+  .object({
+    id: z.string().max(64).optional(),
+    label: z.string().trim().min(1, "عنوان وردایانت لازم است").max(80),
+    platform: z.string().trim().min(1, "پلتفرم لازم است").max(40),
+    region: z.string().trim().min(1, "ریجن لازم است").max(40),
+    capacity: z.string().trim().min(1, "حجم/مقدار لازم است").max(40),
+    // برای نسخه‌های دلاری این عدد نادیده گرفته می‌شود و سرور خودش حساب می‌کند
+    price: z.number().int().min(0).max(1_000_000_000),
+    compareAtPrice: z.number().int().min(0).max(1_000_000_000).nullable().optional(),
+
+    /** true یعنی قیمت تومانی از روی نرخ دلار حساب شود */
+    usdPriced: z.boolean().optional(),
+    /** قیمت دلاری به سِنت — ۵۰۰ یعنی ۵ دلار. سقف ۱۰۰٬۰۰۰ دلار */
+    priceUsd: z.number().int().min(0).max(10_000_000).nullable().optional(),
+    compareAtUsd: z.number().int().min(0).max(10_000_000).nullable().optional(),
+
+    stock: z.number().int().min(0).max(100000),
+    isActive: z.boolean(),
+  })
+  .superRefine((v, ctx) => {
+    if (v.usdPriced) {
+      if (!v.priceUsd || v.priceUsd <= 0) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["priceUsd"],
+          message: "برای نسخه‌ی دلاری، قیمت به دلار را وارد کنید.",
+        });
+      }
+    } else if (v.price < 1000) {
+      // همان قاعده‌ی قبلی، ولی فقط برای نسخه‌هایی که قیمت تومانی دستی دارند
+      ctx.addIssue({
+        code: "custom",
+        path: ["price"],
+        message: "قیمت باید حداقل ۱٬۰۰۰ تومان باشد",
+      });
+    }
+  });
+
+/** تنظیمات نرخ دلار در پنل ادمین */
+export const adminUsdRateSchema = z.object({
+  usdRate: z
+    .number()
+    .int()
+    .min(1000, "نرخ دلار باید حداقل ۱٬۰۰۰ تومان باشد")
+    .max(100_000_000, "نرخ دلار بیش از حد بزرگ است"),
+  marginPercent: z
+    .number()
+    .int()
+    .min(0, "درصد سود نمی‌تواند منفی باشد")
+    .max(100, "درصد سود حداکثر ۱۰۰ است"),
+  roundTo: z
+    .number()
+    .int()
+    .min(1, "رند کردن باید حداقل ۱ باشد")
+    .max(1_000_000, "عدد رند کردن بیش از حد بزرگ است"),
+  /** تایید صریح مدیر وقتی نرخ جهش غیرعادی دارد */
+  confirmJump: z.boolean().optional(),
 });
+
+export type AdminUsdRateInput = z.infer<typeof adminUsdRateSchema>;
 
 export const adminProductSchema = z.object({
   id: z.string().max(64).optional(),
@@ -224,6 +274,21 @@ export const adminProductSchema = z.object({
     .array(z.object({ key: z.string().trim().max(60), value: z.string().trim().max(200) }))
     .max(20)
     .optional(),
+
+  /**
+   * عنوان و ترتیب کادرهای انتخاب در صفحه‌ی محصول.
+   * ترتیب آرایه همان ترتیبی است که مشتری می‌بیند.
+   */
+  optionLabels: z
+    .array(
+      z.object({
+        axis: z.enum(["platform", "region", "capacity"]),
+        label: z.string().trim().min(1).max(40),
+      })
+    )
+    .max(3)
+    .optional(),
+
   variants: z.array(variantInputSchema).min(1, "حداقل یک وردایانت لازم است").max(40),
 });
 

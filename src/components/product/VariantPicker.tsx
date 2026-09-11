@@ -19,6 +19,25 @@ export type VariantOption = {
   stock: number;
 };
 
+export type OptionAxis = "platform" | "region" | "capacity";
+
+/**
+ * عنوان و ترتیب کادرهای انتخاب. هر محصول مال خودش را دارد:
+ * گیفت‌کارت اپل فقط «گیفت کارت» می‌خواهد، پلی‌استیشن پلاس سه کادر.
+ *
+ * چرا فهرست و نه شیء؟ چون در دیتابیس به صورت JSONB ذخیره می‌شود و JSONB
+ * ترتیب کلیدهای یک شیء را نگه نمی‌دارد — ولی ترتیب آرایه را نگه می‌دارد.
+ */
+export type OptionLabels = { axis: OptionAxis; label: string }[];
+
+const DEFAULT_LABELS: Record<OptionAxis, string> = {
+  platform: "پلتفرم",
+  region: "ریجن",
+  capacity: "حجم / مدت",
+};
+
+const ALL_AXES: OptionAxis[] = ["platform", "region", "capacity"];
+
 const unique = (values: string[]) => [...new Set(values)];
 
 export function VariantPicker({
@@ -26,11 +45,13 @@ export function VariantPicker({
   productTitle,
   image,
   variants,
+  optionLabels,
 }: {
   productSlug: string;
   productTitle: string;
   image: string | null;
   variants: VariantOption[];
+  optionLabels?: OptionLabels | null;
 }) {
   const { add } = useCart();
 
@@ -73,6 +94,43 @@ export function VariantPicker({
 
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+
+  /**
+   * کدام کادرها نمایش داده شوند.
+   *
+   * قاعده: اگر محصول عنوان دلخواه داده باشد، فقط همان محورها دیده می‌شوند.
+   * ولی محوری که بیش از یک مقدار دارد همیشه نمایش داده می‌شود — وگرنه
+   * مشتری راهی برای انتخابش نداشت و بخشی از محصول نامرئی می‌ماند.
+   */
+  const visibleSelects = useMemo(() => {
+    const data: Record<
+      OptionAxis,
+      { options: string[]; value: string; onChange: (v: string) => void }
+    > = {
+      platform: { options: platforms, value: platform, onChange: setPlatform },
+      region: { options: regions, value: region, onChange: setRegion },
+      capacity: { options: capacities, value: capacity, onChange: setCapacity },
+    };
+
+    // ترتیب و عنوان از خود محصول می‌آید؛ اگر تعریف نشده بود، حالت پیش‌فرض
+    const wanted: OptionLabels =
+      optionLabels && optionLabels.length > 0
+        ? optionLabels
+        : ALL_AXES.map((axis) => ({ axis, label: DEFAULT_LABELS[axis] }));
+
+    const shown = wanted.map((o) => ({ axis: o.axis, label: o.label, ...data[o.axis] }));
+
+    // محوری که چند مقدار دارد ولی محصول عنوانی برایش نداده، باز هم باید
+    // دیده شود — وگرنه مشتری راهی برای انتخابش ندارد.
+    for (const axis of ALL_AXES) {
+      if (shown.some((s) => s.axis === axis)) continue;
+      if (data[axis].options.length > 1) {
+        shown.push({ axis, label: DEFAULT_LABELS[axis], ...data[axis] });
+      }
+    }
+
+    return shown;
+  }, [optionLabels, platforms, platform, regions, region, capacities, capacity]);
 
   const maxQty = Math.min(MAX_QTY_PER_ITEM, selected?.stock ?? 0);
   const canAdd = Boolean(selected) && maxQty > 0;
@@ -129,36 +187,23 @@ export function VariantPicker({
         )}
       </div>
 
-      {/* انتخاب‌گرهای وابسته */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Select
-          label="پلتفرم"
-          value={platform}
-          options={platforms}
-          onChange={(v) => {
-            setPlatform(v);
-            setQuantity(1);
-          }}
-        />
-        <Select
-          label="ریجن"
-          value={region}
-          options={regions}
-          onChange={(v) => {
-            setRegion(v);
-            setQuantity(1);
-          }}
-        />
-        <Select
-          label="حجم / مدت"
-          value={capacity}
-          options={capacities}
-          onChange={(v) => {
-            setCapacity(v);
-            setQuantity(1);
-          }}
-        />
-      </div>
+      {/* کادرهای انتخاب — عنوان و تعدادشان به خود محصول بستگی دارد */}
+      {visibleSelects.length > 0 && (
+        <div className="flex flex-col gap-4">
+          {visibleSelects.map((s) => (
+            <Select
+              key={s.axis}
+              label={s.label}
+              value={s.value}
+              options={s.options}
+              onChange={(v) => {
+                s.onChange(v);
+                setQuantity(1);
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* تعداد و افزودن به سبد */}
       <div className="flex flex-wrap items-center gap-4">

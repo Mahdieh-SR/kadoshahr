@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <image href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmY4YTNkIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QXBwbGUgQXJjYWRlPC90aXRsZT48cGF0aCBkPSJNLjE5OCAxOC4yNGEuOTY2Ljk2NiAwIDAgMS0uMTk0LS41NzF2LS45NTVzMC0uNTcxLjU2My0uMzEzYzAgMCA2LjkxOSAzLjEzNSA4LjAzMyAzLjYyNmE3LjgzMiA3LjgzMiAwIDAgMCAzLjQwOC43MjkgOC4yMTYgOC4yMTYgMCAwIDAgMy4zOTYtLjcyOWw4LjAzNy0zLjYyNmMuNTU5LS4yNTguNTU5LjMxMy41NTkuMzEzdi45NTVhMS4wMzggMS4wMzggMCAwIDEtLjE5OC41NzVjLS4xOS4yNTgtLjUxNS41MzktMS40MTEuOTU5LS43MTMuMzM3LTYuMjMgMi44MTgtNi45OTUgMy4xN2E4LjAwOCA4LjAwOCAwIDAgMS0zLjQuNzI5IDguMzM2IDguMzM2IDAgMCAxLTMuODItLjkyN2MtMS40MzUtLjY1LTUuODQ5LTIuNjMxLTYuNTY3LTIuOTcyLS45LS40MjgtMS4xNTMtLjY1NC0xLjQxMS0uOTYzem0xLjQxMS01Ljk3M2w2Ljk4Ny0zLjE3YTcuOTc1IDcuOTc1IDAgMCAxIDIuMTY0LS42MzR2NS43MDdjMCAuMzk2LjU3MS42OTcgMS4yMzYuNjk3czEuMTQxLS4zMTMgMS4xNDEtLjY5N1Y4LjQ3OWMuNzc4LjEwNSAxLjU0LjMxMyAyLjI2My42MThsNi45ODcgMy4xN2MuNTc5LjI3MyAxLjYwOS43NjEgMS42MDkgMS41MzhzLTEuMDExIDEuMjM2LTEuNjA5IDEuNTNsLTYuOTg3IDMuMTdhOC4yIDguMiAwIDAgMS0zLjM5Ni43MjkgNy44MzIgNy44MzIgMCAwIDEtMy40MDgtLjcyOWwtNi45ODctMy4xN0MxLjAxMSAxNS4wNDIgMCAxNC41NzQgMCAxMy44MDFzMS4wMy0xLjI2NCAxLjYwOS0xLjUzNHptMS44MDcgMi4yNDdjLjc3LjM5NiAxLjY4My4zOTYgMi40NTMgMCAuNjgyLS4zOTYuNjg2LTEuMDI2IDAtMS40MTlhMi43MDUgMi43MDUgMCAwIDAtMi40NTMgMGMtLjY4LjM5Mi0uNjY2IDEuMDIgMCAxLjQxOXpNMTIgNy41OTVhMy4zNSAzLjM1IDAgMSAxIDMuMzQ5LTMuMzUxdi4wMDNjMCAxLjg0OS0xLjUgMy4zNDgtMy4zNDkgMy4zNDh6Ii8+PC9zdmc+Cg==" x="362" y="158" width="76" height="76"/>
+  <text x="400" y="290" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#0b0917" text-anchor="middle">Arcade</text>
+  <g opacity="0.95">
+    <rect x="250" y="400" width="44" height="90" rx="22" fill="#ff8a3d" opacity="0.35"/>
+    <rect x="312" y="370" width="44" height="120" rx="22" fill="#ff8a3d" opacity="0.55"/>
+    <rect x="374" y="340" width="44" height="150" rx="22" fill="#ff8a3d" opacity="0.9"/>
+    <rect x="436" y="370" width="44" height="120" rx="22" fill="#ff8a3d" opacity="0.55"/>
+    <rect x="498" y="400" width="44" height="90" rx="22" fill="#ff8a3d" opacity="0.35"/>
+  </g>
+
+</svg>

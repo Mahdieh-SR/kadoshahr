@@ -79,10 +79,8 @@ export default async function ProductPage({ params }: Params) {
               {product.title}
             </h1>
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted">
-              <span>{formatNumber(product.soldCount)} بار فروخته شده</span>
-
-              {rating !== null && (
+            {rating !== null && (
+              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted">
                 <span className="flex items-center gap-1.5">
                   <Stars rating={rating} size={14} />
                   <span>
@@ -90,8 +88,8 @@ export default async function ProductPage({ params }: Params) {
                     نظر
                   </span>
                 </span>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           <VariantPicker
@@ -99,6 +97,7 @@ export default async function ProductPage({ params }: Params) {
             productTitle={product.title}
             image={product.images[0] ?? null}
             variants={product.variants}
+            optionLabels={product.optionLabels}
           />
         </div>
       </div>

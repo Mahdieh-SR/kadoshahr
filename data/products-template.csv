@@ -1,0 +1,6 @@
+﻿slug,title,category,description,images,specs,isActive,isFeatured,platform,region,capacity,priceUsd,compareAtUsd,price,compareAtPrice,stock,variantActive
+steam-wallet,گیفت‌کارت استیم,gaming,"شارژ کیف پول استیم برای خرید بازی، آیتم و نرم‌افزار. کد بلافاصله بعد از پرداخت تحویل داده می‌شود.",/products/steam-1.svg|/products/steam-2.svg,تحویل=آنی|اعتبار=بدون تاریخ انقضا,1,1,Steam,آمریکا,۱۰ دلاری,10,12,,,25,1
+steam-wallet,,,,,,,,Steam,آمریکا,۲۰ دلاری,20,,,,25,1
+steam-wallet,,,,,,,,Steam,ترکیه,۱۰ دلاری,8.5,,,,25,1
+steam-wallet,,,,,,,,Steam,ترکیه,۲۰ دلاری,16.9,,,,25,1
+apple-id-service,ساخت اپل آیدی شخصی,subscriptions,"ساخت اپل آیدی به نام خودتان با ایمیل و اطلاعات اختصاصی. تحویل حداکثر تا ۲۴ ساعت.",/products/apple-1.svg,تحویل=حداکثر ۲۴ ساعت|پشتیبانی=۷ روزه,1,0,خدمات,ایران,یک اپل آیدی,,,۳۵۰٬۰۰۰,,50,1

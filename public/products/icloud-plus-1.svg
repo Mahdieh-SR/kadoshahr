@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <circle cx="660" cy="90" r="190" fill="#3b9dff" opacity="0.16"/>
+  <circle cx="120" cy="540" r="150" fill="#3b9dff" opacity="0.12"/>
+  <rect x="160" y="150" width="480" height="300" rx="26" fill="#0b0917" stroke="#3b9dff" stroke-width="2" opacity="0.98"/>
+  <rect x="160" y="150" width="480" height="10" rx="5" fill="#3b9dff"/>
+  <rect x="196" y="356" width="150" height="14" rx="7" fill="#3b9dff" opacity="0.55"/>
+  <rect x="196" y="386" width="96" height="14" rx="7" fill="#ffffff" opacity="0.16"/>
+  <circle cx="576" cy="378" r="30" fill="#3b9dff" opacity="0.85"/>
+  <image href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjM2I5ZGZmIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+aUNsb3VkPC90aXRsZT48cGF0aCBkPSJNMTMuNzYyIDQuMjlhNi41MSA2LjUxIDAgMCAwLTUuNjY5IDMuMzMyIDMuNTcxIDMuNTcxIDAgMCAwLTEuNTU4LS4zNiAzLjU3MSAzLjU3MSAwIDAgMC0zLjUxNiAzQTQuOTE4IDQuOTE4IDAgMCAwIDAgMTQuNzk2YTQuOTE4IDQuOTE4IDAgMCAwIDQuOTIgNC45MTQgNC45MyA0LjkzIDAgMCAwIC42MTctLjA0NWgxNC40MmMyLjMwNS0uMjcyIDQuMDQxLTIuMjU4IDQuMDQzLTQuNTg5di0uMDA5YTQuNTk0IDQuNTk0IDAgMCAwLTMuNzI3LTQuNTA4IDYuNTEgNi41MSAwIDAgMC02LjUxMS02LjI3eiIvPjwvc3ZnPgo=" x="362" y="183" width="76" height="76"/>
+  <text x="400" y="315" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#ffffff" text-anchor="middle">iCloud+</text>
+
+</svg>

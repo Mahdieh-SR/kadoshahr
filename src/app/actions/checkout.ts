@@ -8,6 +8,7 @@ import { getClientIp, rateLimit, tooManyRequestsMessage } from "@/lib/rate-limit
 import { checkoutSchema } from "@/lib/validation";
 import { evaluateDiscount } from "@/lib/discount";
 import { requestPayment } from "@/lib/zarinpal";
+import { baseUrl } from "@/lib/base-url";
 
 export type CheckoutResult =
   | { ok: true; paymentUrl: string; orderNumber: string }
@@ -158,7 +159,7 @@ export async function startCheckout(input: unknown): Promise<CheckoutResult> {
     .catch(() => undefined);
 
   // ۶) درخواست به درگاه با مبلغ محاسبه‌شده‌ی سرور
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const base = baseUrl();
   const payment = await requestPayment({
     amountToman: order.totalAmount,
     description: `پرداخت سفارش ${order.orderNumber}`,

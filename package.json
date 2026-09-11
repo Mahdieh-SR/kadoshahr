@@ -15,7 +15,13 @@
     "limits:reset": "node scripts/reset-limits.mjs",
     "test": "node scripts/run-all-tests.mjs",
     "orders:repair": "node scripts/repair-orders.mjs",
-    "test:live": "node scripts/test-live.mjs"
+    "catalog:check": "node scripts/seed-catalog.mjs --dry-run",
+    "catalog:apply": "node scripts/seed-catalog.mjs",
+    "products:check": "node scripts/import-products.mjs --dry-run",
+    "products:import": "node scripts/import-products.mjs",
+    "test:live": "node scripts/test-live.mjs",
+    "db:copy": "node scripts/db-copy.mjs",
+    "load:test": "node scripts/load-test.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

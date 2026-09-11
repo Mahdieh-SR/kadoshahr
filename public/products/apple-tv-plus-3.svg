@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <image href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjOGY5YmIzIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QXBwbGUgVFY8L3RpdGxlPjxwYXRoIGQ9Ik0yMC41NyAxNy43MzVoLTEuODE1bC0zLjM0LTkuMjAzaDEuNjMzbDIuMDIgNS45ODdjLjA3NS4yMzEuMjczLjkuNTg2IDIuMDEybC4yOTctLjk5Ny4zMy0xLjAwNiAyLjA5NC02LjAwNEgyNHptLTUuMzQ0LS4wNjZhNS43NiA1Ljc2IDAgMCAxLTEuNTUuMjA3Yy0xLjIzIDAtMS44NC0uNjkzLTEuODQtMi4wODdWOS42NDZoLTEuMDYzVjguNTMyaDEuMTIxVjcuMDgxbDEuNDc2LS42MDJ2Mi4wNjJoMS43MDd2MS4xMTNIMTMuMzh2NS44MDVjMCAuNDQ2LjA3NC43NS4yMTQuOTMyLjE0LjE4Mi4zOTYuMjY0Ljc1LjI2NC4yMDcgMCAuNDk1LS4wNDEuODgzLS4xMTV6bS03LjI5LTUuMzQzYy4wMTcgMS43NjQgMS41NSAyLjM1OCAxLjU2NyAyLjM2Ni0uMDE3LjA0Mi0uMjQ4Ljg0Mi0uODA4IDEuNjU4LS40ODcuNzEtLjk5IDEuNDE4LTEuNzkgMS40MzUtLjc4My4wMTYtMS4wMy0uNDYyLTEuOTMtLjQ2Mi0uODkgMC0xLjE3LjQ0NS0xLjkxMy40NzgtLjc1OC4wMjUtMS4zNDQtLjc3NS0xLjgzOC0xLjQ4NC0uOTk4LTEuNDUxLTEuNzY1LTQuMDk4LS43MzQtNS44OC41MS0uODkgMS40MjYtMS40NTEgMi40MTYtMS40Ni43NS0uMDE2IDEuNDY4LjUxMiAxLjkzLjUxMi40NjEgMCAxLjMyNy0uNjI3IDIuMjM0LS41MzYuMzguMDE2IDEuNDUyLjE1NyAyLjEzNiAxLjE1NC0uMDU4LjAzMy0xLjI3OC43NDMtMS4yNyAyLjIxOU02LjQ2OCA3Ljk4OGMuNDA0LS40OTUuNjg1LTEuMTguNjEtMS44NjQtLjU4NS4wMjUtMS4yOTQuMzg4LTEuNzIzLjg4My0uMzguNDM3LS43MSAxLjEzOC0uNjE5IDEuODA2LjY1Mi4wNSAxLjMyOC0uMzM4IDEuNzMyLS44MjVaIi8+PC9zdmc+Cg==" x="362" y="158" width="76" height="76"/>
+  <text x="400" y="290" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#0b0917" text-anchor="middle">Apple TV+</text>
+  <g opacity="0.95">
+    <rect x="250" y="400" width="44" height="90" rx="22" fill="#8f9bb3" opacity="0.35"/>
+    <rect x="312" y="370" width="44" height="120" rx="22" fill="#8f9bb3" opacity="0.55"/>
+    <rect x="374" y="340" width="44" height="150" rx="22" fill="#8f9bb3" opacity="0.9"/>
+    <rect x="436" y="370" width="44" height="120" rx="22" fill="#8f9bb3" opacity="0.55"/>
+    <rect x="498" y="400" width="44" height="90" rx="22" fill="#8f9bb3" opacity="0.35"/>
+  </g>
+
+</svg>

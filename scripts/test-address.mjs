@@ -75,7 +75,12 @@ async function loginNewUser() {
 }
 
 const { rows: variants } = await db.query(
-  `select id from "ProductVariant" where stock > 3 limit 1`
+  // فقط نسخه‌ای که واقعاً در فروشگاه قابل خرید است — نسخه‌ی غیرفعال یا
+  // نسخه‌ی محصول پنهان‌شده در تسویه‌حساب رد می‌شود.
+  `select v.id from "ProductVariant" v
+     join "Product" p on p.id = v."productId"
+    where v.stock > 3 and v."isActive" and p."isActive"
+    limit 1`
 );
 const variantId = variants[0].id;
 

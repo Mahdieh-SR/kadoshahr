@@ -12,7 +12,7 @@ import { rtlWords } from "@/lib/og-rtl";
  */
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "گیفت‌لند — خرید گیفت‌کارت و اکانت دیجیتال";
+export const alt = "کادوشهر — خرید گیفت‌کارت و اکانت دیجیتال";
 
 /**
  * یک خط متن فارسی؛ هر کلمه یک عنصر جداست.
@@ -58,7 +58,7 @@ export default async function OpengraphImage() {
       >
         {/* لوگو — آیکون سمت راست، مثل هدر سایت */}
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <Line text="گیفت‌لند" style={{ color: "#edeaf7", fontSize: 46 }} />
+          <Line text="کادوشهر" style={{ color: "#edeaf7", fontSize: 46 }} />
           <div
             style={{
               width: 72,

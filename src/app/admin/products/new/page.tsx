@@ -3,14 +3,18 @@ import { ProductForm, emptyVariant } from "@/components/admin/ProductForm";
 import { ChevronLeftIcon } from "@/components/ui/icons";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
+import { getPricingSettings } from "@/lib/exchange-rate";
 
 export default async function NewProductPage() {
   await requireAdmin();
 
-  const categories = await prisma.category.findMany({
-    orderBy: { sortOrder: "asc" },
-    select: { id: true, name: true },
-  });
+  const [categories, settings] = await Promise.all([
+    prisma.category.findMany({
+      orderBy: { sortOrder: "asc" },
+      select: { id: true, name: true },
+    }),
+    getPricingSettings(),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -27,6 +31,11 @@ export default async function NewProductPage() {
 
       <ProductForm
         categories={categories}
+        pricing={{
+          usdRate: settings.usdRate,
+          marginPercent: settings.marginPercent,
+          roundTo: settings.roundTo,
+        }}
         initial={{
           title: "",
           slug: "",
@@ -36,6 +45,7 @@ export default async function NewProductPage() {
           isActive: true,
           isFeatured: false,
           specs: [{ key: "زمان تحویل", value: "" }],
+          optionLabels: [{ axis: "capacity", label: "مدت زمان اشتراک" }],
           variants: [{ ...emptyVariant }],
         }}
       />

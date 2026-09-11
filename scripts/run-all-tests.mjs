@@ -14,6 +14,7 @@ const suites = [
   ["test-payment", "پرداخت و تلاش‌های تقلب"],
   ["test-admin", "دسترسی و سفارش‌های پنل ادمین"],
   ["test-admin-products", "مدیریت محصولات"],
+  ["test-pricing", "قیمت‌گذاری دلاری"],
   ["test-discount", "کد تخفیف"],
   ["test-reviews", "نظرات محصول"],
 ];

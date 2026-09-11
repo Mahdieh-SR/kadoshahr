@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOutAction } from "@/app/actions/auth";
 import {
   BagIcon,
+  CurrencyIcon,
   LogOutIcon,
   PackageIcon,
   SettingsIcon,
@@ -17,6 +18,7 @@ const items = [
   { href: "/admin", label: "پیشخوان", icon: SettingsIcon, exact: true },
   { href: "/admin/orders", label: "سفارش‌ها", icon: PackageIcon },
   { href: "/admin/products", label: "محصولات", icon: BagIcon },
+  { href: "/admin/pricing", label: "نرخ دلار", icon: CurrencyIcon },
   { href: "/admin/discounts", label: "کدهای تخفیف", icon: SparkIcon },
   { href: "/admin/reviews", label: "نظرات", icon: HeadsetIcon },
 ];

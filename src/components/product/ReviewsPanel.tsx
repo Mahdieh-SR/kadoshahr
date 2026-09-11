@@ -211,7 +211,7 @@ export function ReviewsPanel({
                 {review.adminReply && (
                   <div className="mt-4 rounded-xl border-s-2 border-accent-400 bg-ink-950 p-4">
                     <span className="text-xs font-bold text-accent-400">
-                      پاسخ گیفت‌لند
+                      پاسخ کادوشهر
                     </span>
                     <p className="mt-2 text-sm leading-7 whitespace-pre-line text-muted">
                       {review.adminReply}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <image href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDBkM2QzIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+VElEQUw8L3RpdGxlPjxwYXRoIGQ9Ik0xMi4wMTIgMy45OTJMOC4wMDggNy45OTYgNC4wMDQgMy45OTIgMCA3Ljk5NiA0LjAwNCAxMmw0LjAwNC00LjAwNEwxMi4wMTIgMTJsLTQuMDA0IDQuMDA0IDQuMDA0IDQuMDA0IDQuMDA0LTQuMDA0TDEyLjAxMiAxMmw0LjAwNC00LjAwNC00LjAwNC00LjAwNHpNMTYuMDQyIDcuOTk2bDMuOTc5LTMuOTc5TDI0IDcuOTk2bC0zLjk3OSAzLjk3OXoiLz48L3N2Zz4K" x="362" y="158" width="76" height="76"/>
+  <text x="400" y="290" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#0b0917" text-anchor="middle">Tidal</text>
+  <g opacity="0.95">
+    <rect x="250" y="400" width="44" height="90" rx="22" fill="#00d3d3" opacity="0.35"/>
+    <rect x="312" y="370" width="44" height="120" rx="22" fill="#00d3d3" opacity="0.55"/>
+    <rect x="374" y="340" width="44" height="150" rx="22" fill="#00d3d3" opacity="0.9"/>
+    <rect x="436" y="370" width="44" height="120" rx="22" fill="#00d3d3" opacity="0.55"/>
+    <rect x="498" y="400" width="44" height="90" rx="22" fill="#00d3d3" opacity="0.35"/>
+  </g>
+
+</svg>

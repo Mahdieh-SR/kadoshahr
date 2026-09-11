@@ -323,6 +323,54 @@ let productId;
   }
 }
 
+/* ─── کادرهای انتخاب صفحه‌ی محصول ─── */
+{
+  const optionSlug = `test-options-${Date.now()}`;
+  const r = await save(adminJar, {
+    ...baseProduct,
+    slug: optionSlug,
+    // ترتیب عمداً غیرالفبایی است تا ثابت شود همین ترتیب ذخیره می‌شود
+    optionLabels: [
+      { axis: "capacity", label: "مدت زمان اشتراک" },
+      { axis: "platform", label: "پلن اکانت" },
+      // محور تکراری باید حذف شود
+      { axis: "capacity", label: "تکراری" },
+    ],
+  });
+
+  check("محصول با کادرهای انتخاب دلخواه ساخته شد", r.ok === true, r.message ?? r.error);
+
+  const { rows } = await db.query('SELECT "optionLabels" FROM "Product" WHERE slug = $1', [
+    optionSlug,
+  ]);
+  const labels = rows[0]?.optionLabels;
+
+  check(
+    "ترتیب کادرها همان‌طور که وارد شد ذخیره شد",
+    Array.isArray(labels) &&
+      labels.length === 2 &&
+      labels[0].axis === "capacity" &&
+      labels[1].axis === "platform",
+    JSON.stringify(labels)
+  );
+
+  check(
+    "محور تکراری کنار گذاشته شد",
+    Array.isArray(labels) && labels.filter((l) => l.axis === "capacity").length === 1,
+    `${Array.isArray(labels) ? labels.length : 0} کادر ذخیره شد`
+  );
+
+  // عنوان بیش از حد بلند باید رد شود
+  const tooLong = await save(adminJar, {
+    ...baseProduct,
+    slug: `${optionSlug}-x`,
+    optionLabels: [{ axis: "capacity", label: "ط".repeat(41) }],
+  });
+  check("🔒 عنوان کادر بیش از ۴۰ کاراکتر رد می‌شود", tooLong.ok === false, tooLong.error);
+
+  if (r.id) await save(adminJar, { __action: "delete", id: r.id });
+}
+
 await db.end();
 const passed = results.filter((r) => r.passed).length;
 console.log(`\n${passed} از ${results.length} تست موفق\n`);

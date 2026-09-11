@@ -1,10 +1,24 @@
 /**
- * تست سایت زنده روی لیارا — کل مسیر خرید از ورود تا صفحه‌ی نتیجه.
+ * تست سایت زنده — کل مسیر خرید از ورود تا صفحه‌ی نتیجه.
  *
- * اجرا: node scripts/test-live.mjs
- * (آدرس را با متغیر LIVE_URL می‌توان عوض کرد)
+ * اجرا:
+ *   LIVE_URL=https://<آدرس سرویس> node scripts/test-live.mjs
+ *
+ * آدرس عمداً پیش‌فرض ندارد: یک بار با آدرس اشتباه تست گرفتن و «همه سبز»
+ * دیدن، بدترین حالت ممکن است.
  */
-const BASE = process.env.LIVE_URL ?? "https://giftland.liara.run";
+const BASE = (process.env.LIVE_URL ?? "").replace(/\/+$/, "");
+
+if (!BASE) {
+  console.error(
+    "متغیر LIVE_URL تنظیم نشده است.\n" +
+      "  مثال: LIVE_URL=https://kadoshahr.ir node scripts/test-live.mjs"
+  );
+  process.exit(1);
+}
+
+/** برای بررسی اینکه لینک‌های داخل sitemap به همین دامنه اشاره می‌کنند */
+const BASE_HOST = new URL(BASE).host;
 const results = [];
 
 /**
@@ -29,6 +43,18 @@ globalThis.fetch = async (url, opts) => {
 function check(name, passed, detail = "") {
   results.push({ passed });
   console.log(`${passed ? "✔" : "✘"} ${name}${detail ? `\n     ${detail}` : ""}`);
+}
+
+/**
+ * تستی که روی این محیط اصلاً اجراشدنی نیست — نه موفق، نه شکست‌خورده.
+ *
+ * روی سرور واقعی کد تایید عمداً به مرورگر برنمی‌گردد؛ این یک قاعده‌ی امنیتی
+ * است نه نقص. قرمز نشان دادن چنین تستی باعث می‌شود آدم به شکست‌های واقعی هم
+ * بی‌اعتنا شود.
+ */
+function skip(name, reason) {
+  results.push({ passed: true, skipped: true });
+  console.log(`⃝ ${name}\n     رد شد — ${reason}`);
 }
 
 function makeJar() {
@@ -86,7 +112,21 @@ const otp = await (
   })
 ).json();
 
-check("کد تایید صادر و نمایش داده شد", Boolean(otp.devCode), `کد: ${otp.devCode}`);
+/**
+ * وقتی سایت در حالت production است و DEMO_MODE روشن نیست، کد تایید در پاسخ
+ * نمی‌آید. این درست است — پس بقیه‌ی مسیر ورود رد می‌شود، نه شکست‌خورده.
+ */
+const canLogIn = Boolean(otp.devCode);
+
+if (canLogIn) {
+  check("کد تایید صادر و نمایش داده شد", true, `کد: ${otp.devCode}`);
+} else {
+  skip(
+    "کد تایید صادر و نمایش داده شد",
+    "سایت در حالت production است و کد تایید را برنمی‌گرداند (رفتار درست). " +
+      "برای تست کامل مسیر خرید، موقتاً DEMO_MODE=true بگذار."
+  );
+}
 
 {
   const csrfRes = await fetch(`${BASE}/api/auth/csrf`);
@@ -109,7 +149,8 @@ check("کد تایید صادر و نمایش داده شد", Boolean(otp.devCod
     }),
   });
   jar.absorb(res);
-  check("ورود موفق و سشن ساخته شد", jar.has("session-token"));
+  if (canLogIn) check("ورود موفق و سشن ساخته شد", jar.has("session-token"));
+  else skip("ورود موفق و سشن ساخته شد", "بدون کد تایید ممکن نیست");
 }
 
 /* ── ۴) پنل کاربری بعد از ورود ── */
@@ -118,7 +159,9 @@ check("کد تایید صادر و نمایش داده شد", Boolean(otp.devCod
     headers: { cookie: jar.header() },
     redirect: "manual",
   });
-  check("پنل کاربری بعد از ورود باز می‌شود", res.status === 200, `کد ${res.status}`);
+  if (canLogIn)
+    check("پنل کاربری بعد از ورود باز می‌شود", res.status === 200, `کد ${res.status}`);
+  else skip("پنل کاربری بعد از ورود باز می‌شود", "بدون ورود ممکن نیست");
 }
 
 /* ── ۵) سبد و قیمت‌گذاری ── */
@@ -131,10 +174,19 @@ let variantId = null;
 
   // شناسه‌ها ممکن است در HTML به شکل‌های مختلف کدگذاری شوند؛ همه‌ی
   // کاندیداها را جمع می‌کنیم و با API سبد بررسی می‌کنیم کدام واقعی است.
+  //
+  // ⚠️ دو شکل شناسه در دیتابیس وجود دارد و هر دو باید پوشش داده شوند:
+  //   • cuid  — رکوردهایی که Prisma ساخته (`c` + ۲۴ کاراکتر)
+  //   • UUID  — رکوردهایی که seed-catalog.mjs با gen_random_uuid() ساخته
+  // قبلاً فقط cuid گرفته می‌شد و روی دیتابیس تازه‌ی رانفلر هیچ کاندیدایی
+  // پیدا نمی‌کرد، در حالی که خود سایت سالم بود.
   const candidates = [
-    ...new Set(
-      (productHtml.match(/c[a-z0-9]{24,}/g) ?? []).filter((id) => id.length < 40)
-    ),
+    ...new Set([
+      ...(productHtml.match(/c[a-z0-9]{24,39}/g) ?? []),
+      ...(productHtml.match(
+        /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g
+      ) ?? []),
+    ]),
   ];
 
   for (const candidate of candidates.slice(0, 25)) {
@@ -173,7 +225,10 @@ if (variantId) {
 }
 
 /* ── ۶) کد تخفیف ── */
-if (variantId) {
+// اعمال کد تخفیف نیاز به ورود دارد، پس بدون کد تایید اجراشدنی نیست.
+if (variantId && !canLogIn) {
+  skip("کد تخفیف WELCOME20 کار می‌کند", "اعمال کد تخفیف نیاز به ورود دارد");
+} else if (variantId) {
   const res = await fetch(`${BASE}/api/discount`, {
     method: "POST",
     headers: { "Content-Type": "application/json", cookie: jar.header() },
@@ -221,10 +276,18 @@ if (variantId) {
   const body = await res.text();
   check(
     "نقشه‌ی سایت ساخته می‌شود",
-    res.status === 200 && body.includes("giftland.liara.run")
+    res.status === 200 && body.includes(BASE_HOST),
+    `لینک‌های sitemap باید به ${BASE_HOST} اشاره کنند`
   );
 }
 
-const passed = results.filter((r) => r.passed).length;
-console.log(`\n${passed} از ${results.length} تست موفق\n`);
-process.exit(passed === results.length ? 0 : 1);
+const skipped = results.filter((r) => r.skipped).length;
+const ran = results.filter((r) => !r.skipped);
+const passed = ran.filter((r) => r.passed).length;
+
+console.log(
+  `\n${passed} از ${ran.length} تست موفق` +
+    (skipped ? `  ·  ${skipped} تست رد شد (نیازمند DEMO_MODE)` : "") +
+    "\n"
+);
+process.exit(passed === ran.length ? 0 : 1);

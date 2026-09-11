@@ -133,6 +133,13 @@ export const HeadsetIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const MailIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m2 7 9.4 6.3a2 2 0 0 0 2.2 0L23 7" />
+  </Icon>
+);
+
 export const PackageIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
@@ -180,10 +187,29 @@ export const SparkIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const CurrencyIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 2v20" />
+    <path d="M17 6.5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+  </Icon>
+);
+
+export const RefreshIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M3 12a9 9 0 0 1 15.5-6.2L21 8" />
+    <path d="M21 3v5h-5" />
+    <path d="M21 12a9 9 0 0 1-15.5 6.2L3 16" />
+    <path d="M3 21v-5h5" />
+  </Icon>
+);
+
 /** نگاشت نام آیکون دسته‌بندی (که در دیتابیس ذخیره شده) به کامپوننت */
 export const categoryIcons: Record<string, (p: IconProps) => React.ReactElement> = {
   gamepad: GamepadIcon,
   play: PlayIcon,
   bag: BagIcon,
   spark: SparkIcon,
+  headset: HeadsetIcon,
+  bolt: BoltIcon,
+  package: PackageIcon,
 };

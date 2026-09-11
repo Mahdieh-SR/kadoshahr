@@ -5,6 +5,8 @@ import { ChevronLeftIcon } from "@/components/ui/icons";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import { formatNumber } from "@/lib/format";
+import { CENTS_PER_USD, getPricingSettings } from "@/lib/exchange-rate";
+import type { OptionAxis } from "@/components/product/VariantPicker";
 
 type Spec = { key: string; value: string };
 
@@ -16,7 +18,7 @@ export default async function EditProductPage({
   await requireAdmin();
   const { id } = await params;
 
-  const [product, categories] = await Promise.all([
+  const [product, categories, settings] = await Promise.all([
     prisma.product.findUnique({
       where: { id },
       select: {
@@ -25,6 +27,7 @@ export default async function EditProductPage({
         slug: true,
         description: true,
         specs: true,
+        optionLabels: true,
         images: true,
         isActive: true,
         isFeatured: true,
@@ -39,6 +42,9 @@ export default async function EditProductPage({
             capacity: true,
             price: true,
             compareAtPrice: true,
+            priceUsd: true,
+            compareAtUsd: true,
+            usdPriced: true,
             stock: true,
             isActive: true,
           },
@@ -49,6 +55,7 @@ export default async function EditProductPage({
       orderBy: { sortOrder: "asc" },
       select: { id: true, name: true },
     }),
+    getPricingSettings(),
   ]);
 
   if (!product) notFound();
@@ -56,6 +63,13 @@ export default async function EditProductPage({
   const specs: Spec[] = Array.isArray(product.specs)
     ? (product.specs as unknown as Spec[]).filter(
         (s) => s && typeof s.key === "string" && typeof s.value === "string"
+      )
+    : [];
+
+  const AXES: OptionAxis[] = ["platform", "region", "capacity"];
+  const optionLabels = Array.isArray(product.optionLabels)
+    ? (product.optionLabels as unknown as { axis: OptionAxis; label: string }[]).filter(
+        (o) => o && AXES.includes(o.axis) && typeof o.label === "string" && o.label.trim()
       )
     : [];
 
@@ -88,6 +102,11 @@ export default async function EditProductPage({
 
       <ProductForm
         categories={categories}
+        pricing={{
+          usdRate: settings.usdRate,
+          marginPercent: settings.marginPercent,
+          roundTo: settings.roundTo,
+        }}
         initial={{
           id: product.id,
           title: product.title,
@@ -98,6 +117,7 @@ export default async function EditProductPage({
           isActive: product.isActive,
           isFeatured: product.isFeatured,
           specs: specs.length > 0 ? specs : [{ key: "", value: "" }],
+          optionLabels,
           variants: product.variants.map((v) => ({
             id: v.id,
             platform: v.platform,
@@ -105,6 +125,9 @@ export default async function EditProductPage({
             capacity: v.capacity,
             price: String(v.price),
             compareAtPrice: v.compareAtPrice ? String(v.compareAtPrice) : "",
+            usdPriced: v.usdPriced,
+            priceUsd: v.priceUsd ? String(v.priceUsd / CENTS_PER_USD) : "",
+            compareAtUsd: v.compareAtUsd ? String(v.compareAtUsd / CENTS_PER_USD) : "",
             stock: String(v.stock),
             isActive: v.isActive,
           })),

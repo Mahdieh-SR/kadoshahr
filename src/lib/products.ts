@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import { averageRating } from "./reviews";
+import type { OptionLabels } from "@/components/product/VariantPicker";
 
 export type ProductCard = {
   id: string;
@@ -118,6 +119,15 @@ export type ProductFilters = {
   maxPrice?: number;
   sort?: ProductSort;
   take?: number;
+  /**
+   * فقط محصولاتی که همین حالا قابل خریدند.
+   *
+   * برای ویترین صفحه‌ی اصلی لازم است: نشان دادن محصول ناموجود در جای
+   * پرترافیک سایت، بازدیدکننده را به صفحه‌ای می‌برد که نمی‌تواند چیزی از آن
+   * بخرد. در صفحه‌ی فهرست محصولات عمداً روشن نمی‌شود تا کاربر بداند چه
+   * چیزهایی موجود می‌شوند.
+   */
+  inStockOnly?: boolean;
 };
 
 export async function getProductCards(
@@ -132,12 +142,14 @@ export async function getProductCards(
     maxPrice,
     sort = "newest",
     take,
+    inStockOnly = false,
   } = filters;
 
   // شرط‌های مربوط به وردایانت با هم داخل یک `some` قرار می‌گیرند تا
   // «یک وردایانت که هم‌زمان همه‌ی شرط‌ها را داشته باشد» پیدا شود،
   // نه وردایانت‌های مختلف که هرکدام یکی از شرط‌ها را دارند.
   const variantWhere: Record<string, unknown> = { isActive: true };
+  if (inStockOnly) variantWhere.stock = { gt: 0 };
   if (regions?.length) variantWhere.region = { in: regions };
   if (platforms?.length) variantWhere.platform = { in: platforms };
   if (minPrice !== undefined || maxPrice !== undefined) {
@@ -196,6 +208,8 @@ export async function getProductCards(
 
 export async function getCategories() {
   return prisma.category.findMany({
+    // دسته‌ی بدون محصول نمایش داده نمی‌شود
+    where: { products: { some: { isActive: true } } },
     orderBy: { sortOrder: "asc" },
     select: {
       id: true,
@@ -225,8 +239,8 @@ export async function getProductBySlug(slug: string) {
       title: true,
       description: true,
       specs: true,
+      optionLabels: true,
       images: true,
-      soldCount: true,
       reviewCount: true,
       ratingSum: true,
       categoryId: true,
@@ -256,7 +270,35 @@ export async function getProductBySlug(slug: string) {
       )
     : [];
 
-  return { ...product, specs };
+  return { ...product, specs, optionLabels: readOptionLabels(product.optionLabels) };
+}
+
+const OPTION_AXES = ["platform", "region", "capacity"] as const;
+
+/**
+ * فقط سه محور مجاز و فقط عنوان متنی — هرچه غیر از این باشد نادیده می‌رود.
+ * محتوای JSON از دیتابیس می‌آید و ممکن است دستی ویرایش شده باشد، پس
+ * اینجا مثل ورودی ناشناس با آن رفتار می‌کنیم.
+ */
+function readOptionLabels(value: unknown): OptionLabels | null {
+  if (!Array.isArray(value)) return null;
+
+  const out: OptionLabels = [];
+  const seen = new Set<string>();
+
+  for (const item of value) {
+    if (!item || typeof item !== "object") continue;
+    const { axis, label } = item as { axis?: unknown; label?: unknown };
+
+    if (typeof axis !== "string" || typeof label !== "string") continue;
+    if (!OPTION_AXES.includes(axis as (typeof OPTION_AXES)[number])) continue;
+    if (!label.trim() || seen.has(axis)) continue;
+
+    seen.add(axis);
+    out.push({ axis: axis as (typeof OPTION_AXES)[number], label: label.trim() });
+  }
+
+  return out.length > 0 ? out : null;
 }
 
 export async function getRelatedProducts(

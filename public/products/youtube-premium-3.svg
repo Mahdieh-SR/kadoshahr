@@ -1,16 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img">
-  <rect width="800" height="600" fill="#14122a"/>
+  <rect width="800" height="600" fill="#ffffff"/>
   
-  <g opacity="0.85">
-    <rect x="70" y="120" width="70" height="360" rx="35" fill="#ff5252" opacity="0.25"/>
-    <rect x="170" y="170" width="70" height="260" rx="35" fill="#ff5252" opacity="0.45"/>
-    <rect x="270" y="210" width="70" height="180" rx="35" fill="#ff5252" opacity="0.7"/>
-    <rect x="370" y="170" width="70" height="260" rx="35" fill="#ff5252" opacity="0.45"/>
-    <rect x="470" y="120" width="70" height="360" rx="35" fill="#ff5252" opacity="0.25"/>
+  <image href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmYwMDMzIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+WW91VHViZTwvdGl0bGU+PHBhdGggZD0iTTIzLjQ5OCA2LjE4NmEzLjAxNiAzLjAxNiAwIDAgMC0yLjEyMi0yLjEzNkMxOS41MDUgMy41NDUgMTIgMy41NDUgMTIgMy41NDVzLTcuNTA1IDAtOS4zNzcuNTA1QTMuMDE3IDMuMDE3IDAgMCAwIC41MDIgNi4xODZDMCA4LjA3IDAgMTIgMCAxMnMwIDMuOTMuNTAyIDUuODE0YTMuMDE2IDMuMDE2IDAgMCAwIDIuMTIyIDIuMTM2YzEuODcxLjUwNSA5LjM3Ni41MDUgOS4zNzYuNTA1czcuNTA1IDAgOS4zNzctLjUwNWEzLjAxNSAzLjAxNSAwIDAgMCAyLjEyMi0yLjEzNkMyNCAxNS45MyAyNCAxMiAyNCAxMnMwLTMuOTMtLjUwMi01LjgxNHpNOS41NDUgMTUuNTY4VjguNDMyTDE1LjgxOCAxMmwtNi4yNzMgMy41Njh6Ii8+PC9zdmc+Cg==" x="362" y="158" width="76" height="76"/>
+  <text x="400" y="290" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#0b0917" text-anchor="middle">YouTube</text>
+  <g opacity="0.95">
+    <rect x="250" y="400" width="44" height="90" rx="22" fill="#ff0033" opacity="0.35"/>
+    <rect x="312" y="370" width="44" height="120" rx="22" fill="#ff0033" opacity="0.55"/>
+    <rect x="374" y="340" width="44" height="150" rx="22" fill="#ff0033" opacity="0.9"/>
+    <rect x="436" y="370" width="44" height="120" rx="22" fill="#ff0033" opacity="0.55"/>
+    <rect x="498" y="400" width="44" height="90" rx="22" fill="#ff0033" opacity="0.35"/>
   </g>
-  <rect x="600" y="120" width="130" height="360" rx="28" fill="#0b0917" stroke="#ff5252" stroke-width="2"/>
-  <circle cx="665" cy="300" r="34" fill="#ff5252"/>
-  <rect x="0" y="500" width="800" height="100" fill="#0b0917"/>
-  <text x="40" y="562" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" fill="#ffffff" text-anchor="start">YouTube</text>
 
 </svg>

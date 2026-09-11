@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isMockMode } from "@/lib/zarinpal";
+import { baseUrl } from "@/lib/base-url";
 
 /**
  * ثبت تصمیم کاربر در درگاه ساختگی («پرداخت کردم» یا «انصراف دادم»).
@@ -14,7 +15,7 @@ import { isMockMode } from "@/lib/zarinpal";
 export async function POST(request: Request) {
   if (!isMockMode()) return new NextResponse(null, { status: 404 });
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const base = baseUrl();
 
   const form = await request.formData();
   const authority = String(form.get("authority") ?? "");

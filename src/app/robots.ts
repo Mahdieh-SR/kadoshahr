@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
+import { baseUrl as base } from "@/lib/base-url";
 
-const base = () => process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+// بدون این، Next فایل را موقع بیلد تولید می‌کند و آدرس داخلش قفل می‌شود.
+export const dynamic = "force-dynamic";
 
 /**
  * به موتورهای جستجو می‌گوید کدام بخش‌ها را ایندکس نکنند.
